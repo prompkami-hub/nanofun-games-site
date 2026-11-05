@@ -11,4 +11,12 @@
 
 继续使用 docs/ 作为 GitHub Pages 静态目录。docs/CNAME 和 dist/CNAME 仍为 nanofungames.com。dist/ 不包含完整游戏，不能直接以其替代 docs/ 部署。继承的 .openai/hosting.json 为历史信息，本次未变更任何 Sites 部署。
 
-本次只迁移 Git。新仓 Pages、域名切换和公网验收尚未完成，旧仓不能删除或关闭 Pages。切换顺序：验证新部署 → 协调旧自定义域名释放与新绑定 → 检查 HTTPS、主页和游戏资源 → 验证后归档旧仓。不要仅以推送成功判断域名已迁移。
+## 线上切换完成：2026-11-05
+
+先使用 pages-preview 分支部署无自定义域名的预览站，验证后由用户在旧仓移除自定义域名，再将 nanofungames.com 绑定到本仓。正式发布来源为 main /docs，HTTPS 证书 approved、https_enforced=true。旧仓 Pages 的 cname 已为 null。
+
+验收结果：默认首页 HTTP 200，内容 SHA-256 与新仓一致；deployment.json 标识本仓；www.nanofungames.com 返回 301 至 HTTPS 主域名；32 个线上文件（合计 48,606,810 字节）SHA-256 与本仓一致，包含活动 WASM、PCK、网页脚本和音频。浏览器实际验证 2048 开局与移动、Snake 开局与方向和暂停、排球单人与双人开局及模拟币扣减，未观察到控制台错误。网页现有 9 项 Node 测试通过。
+
+主页新增部署标识文件，页脚 GitHub 链接更新为本仓；除这些迁移改动外保留原网站和游戏内容。
+
+旧仓不再承载正式域名，可以停用旧仓 Pages，并建议先归档源码保留历史。未执行旧仓下架或删除。检查时 www 的 DNS CNAME 仍为 nanofungg.github.io；当前跳转正常，建议用户在 DNS 提供商处改为 prompkami-hub.github.io（仅主机名，不含协议或仓库路径），清除旧账号引用。

@@ -270,6 +270,15 @@
   },
   "intentionally_updated_original_files": [
     ".gitignore",
-    "README.md"
-  ]
+    "README.md",
+    "docs/index.html",
+    "dist/index.html"
+  ],
+  "deployment": {
+    "date": "2026-11-05",
+    "host": "nanofungames.com",
+    "source": "main:/docs",
+    "https_verified": true,
+    "original_repository_custom_domain_removed": true
+  }
 }

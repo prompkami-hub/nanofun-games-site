@@ -1,6 +1,6 @@
 # NanoFun Arcade
 
-迁移目标仓：https://github.com/prompkami-hub/nanofun-games-site 。配套游戏源码：https://github.com/prompkami-hub/nanofun-games （Private）。本次未切换 GitHub Pages 或域名，迁移状态参见 [MIGRATION.md](MIGRATION.md)。
+网站仓：https://github.com/prompkami-hub/nanofun-games-site 。配套游戏源码：https://github.com/prompkami-hub/nanofun-games （Private）。2026-11-05 已将 nanofungames.com 切换到本仓 GitHub Pages（main /docs），HTTPS 及游戏运行验收通过，详情参见 [MIGRATION.md](MIGRATION.md)。
 
 GitHub Pages serves `docs/` at https://nanofungames.com/ with enforced HTTPS. The www subdomain and the original nanofungg.github.io address redirect to this canonical domain. Keep docs/CNAME and dist/CNAME when publishing.
 
