@@ -1,11 +1,13 @@
 # NanoFun Arcade
 
+迁移目标仓：https://github.com/prompkami-hub/nanofun-games-site 。配套游戏源码：https://github.com/prompkami-hub/nanofun-games （Private）。本次未切换 GitHub Pages 或域名，迁移状态参见 [MIGRATION.md](MIGRATION.md)。
+
 GitHub Pages serves `docs/` at https://nanofungames.com/ with enforced HTTPS. The www subdomain and the original nanofungg.github.io address redirect to this canonical domain. Keep docs/CNAME and dist/CNAME when publishing.
 
 ## Development
 Edit the homepage files in `dist/`, copy them to `docs/`, then run `node preview.mjs` for a localhost preview. Run `node --test tests/*.test.cjs` from this directory.
 
-The Godot source is maintained separately in the private `games/pikachu-volleyball` repository. Only web exports belong in `docs/games/pikachu-volleyball/`. Use a new pack filename and update the HTML mainPack and cache versions when deploying an export.
+The Godot source is maintained separately in the private `prompkami-hub/nanofun-games` repository under `pikachu-volleyball/`. Only web exports belong in `docs/games/pikachu-volleyball/`. Use a new pack filename and update the HTML mainPack and cache versions when deploying an export.
 
 ## Demo wallet
 Email identifies a browser-local demo wallet; no email is verified or sent. Daily grants are 10 simulated coins, each full match/restart costs 1, and a simulated reward adds 10 only at zero balance. No real ads, payments, backend ledger or anti-cheat protection are connected.

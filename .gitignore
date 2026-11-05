@@ -3,3 +3,16 @@ node_modules/
 .env.*
 *.tar.gz
 .DS_Store
+
+# Local credentials and transient state
+.env
+.env.*
+!.env.example
+accounts.json
+credentials.json
+token.json
+profiles/
+chrome_data/
+.DS_Store
+__pycache__/
+*.pyc

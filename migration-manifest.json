@@ -1,0 +1,275 @@
+{
+  "archive": "nanofungg.github.io-main.zip",
+  "archive_sha256": "c7bd4901ae81ed9b8d036678bd9159b6872ced645794fb913ba10ba036880335",
+  "source_commit_recorded_in_zip": "99dcdd58abcae3639936f2f9a082f78efbf5e21b",
+  "baseline_files": {
+    ".gitignore": {
+      "size": 45,
+      "sha256": "7b9b416ee7829eea3333eaaf8d75c31f0415de3b3c37bf66a1fb4c0be22b770c"
+    },
+    ".openai/hosting.json": {
+      "size": 106,
+      "sha256": "e8e3abec3dd6eda3335fa8953d2badf630477ff93c0fb2d8c9669eb29b15af4c"
+    },
+    "README.md": {
+      "size": 2920,
+      "sha256": "5e73c2b993a7e7c14f88499f2ecc7ffc5d4f5785d26c7cfc35833e632c365e44"
+    },
+    "build-i18n.cjs": {
+      "size": 500,
+      "sha256": "bc56840ab7049c34f3ca9684e22b5b69d985428e99e8b98ec990c1afc70399c0"
+    },
+    "dist/CNAME": {
+      "size": 17,
+      "sha256": "818e39227f132cdddb0f088ab7d24a5d192a6fbf76a40c1d54a21705c9eba47b"
+    },
+    "dist/arcade.css": {
+      "size": 27466,
+      "sha256": "77fc35fbd4759bdf4acbac8a2e5fa625a21b8207f2a1dcb2755c7ad55171402e"
+    },
+    "dist/arcade.js": {
+      "size": 9051,
+      "sha256": "5fb8288640e4bc43a16623eeaf74e744702cdf43f2c1638206563142e2086d44"
+    },
+    "dist/assets/volleyball.png": {
+      "size": 176709,
+      "sha256": "e9ae9e0b8cd66e970559bde3c56090e6f37c38672f67ad942b4b5b9742586f47"
+    },
+    "dist/i18n.js": {
+      "size": 40966,
+      "sha256": "fe19f4b8702dd8e4dfb5e9ee751b00a50d5ab0a86bb821911fab92b336dfb85a"
+    },
+    "dist/index.html": {
+      "size": 10084,
+      "sha256": "48d90f74ba8866bd23570e4ea32e74156c724ed440d2fa236031ae86547abcc5"
+    },
+    "dist/locales.tsv": {
+      "size": 34537,
+      "sha256": "96e270bf263c14fc588fed3f58fc0d9357007f8f1311a30d34eb3c4aa4f2cf86"
+    },
+    "dist/mobile.js": {
+      "size": 5711,
+      "sha256": "cd72aee92fe0f7443786e986d92fe251fe4be43ec649c12ddb8bbd406ab3d13d"
+    },
+    "dist/orientation.js": {
+      "size": 2386,
+      "sha256": "257dc8497589171ddea738e481a4c96f3600c918461ba8c737f9ee3820b7c624"
+    },
+    "docs/.nojekyll": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs/CNAME": {
+      "size": 17,
+      "sha256": "818e39227f132cdddb0f088ab7d24a5d192a6fbf76a40c1d54a21705c9eba47b"
+    },
+    "docs/arcade.css": {
+      "size": 27466,
+      "sha256": "77fc35fbd4759bdf4acbac8a2e5fa625a21b8207f2a1dcb2755c7ad55171402e"
+    },
+    "docs/arcade.js": {
+      "size": 9051,
+      "sha256": "5fb8288640e4bc43a16623eeaf74e744702cdf43f2c1638206563142e2086d44"
+    },
+    "docs/assets/volleyball.png": {
+      "size": 176709,
+      "sha256": "e9ae9e0b8cd66e970559bde3c56090e6f37c38672f67ad942b4b5b9742586f47"
+    },
+    "docs/games/2048/app.js": {
+      "size": 4259,
+      "sha256": "a369d2266df1e3f5ad2073e84e5bdabe0f409571ad9a7cf04af2667a00d87799"
+    },
+    "docs/games/2048/audio.js": {
+      "size": 3535,
+      "sha256": "8e740a8b07d55272d1bae721c8c0d9fb57557fd49861eefd88a9c0c942d33fab"
+    },
+    "docs/games/2048/engine.js": {
+      "size": 1066,
+      "sha256": "20b3a1425932ce29efe67fc5042c0f119a3ec04aa2fed003cd7109d0f8d9477d"
+    },
+    "docs/games/2048/index.html": {
+      "size": 1734,
+      "sha256": "996941131344d9ac48cc441ffbbe0084f9815f0ca13115a42345392635e4b411"
+    },
+    "docs/games/2048/style.css": {
+      "size": 5996,
+      "sha256": "d85be7d918f49ba2925f810e296d8339c7ef5f59abe8a47c4a76776c0fc2c8e8"
+    },
+    "docs/games/pikachu-volleyball/arcade-v1.pck": {
+      "size": 2132544,
+      "sha256": "8e0d41f1b404b6e7876f6c509e6ad19aaad1669d7ffb233fdc31dc6775f4f45c"
+    },
+    "docs/games/pikachu-volleyball/arcade-v2.pck": {
+      "size": 2132576,
+      "sha256": "3517095458901cad1b6a6231d20cb2cbc3e9f6bb8d846882c29616516f3f53ab"
+    },
+    "docs/games/pikachu-volleyball/arcade-v3.pck": {
+      "size": 2132640,
+      "sha256": "ffec176b7440349368dfc2f2477f461907d7b9db41b2ebffd3d0758fb2f13a59"
+    },
+    "docs/games/pikachu-volleyball/audio-v1.pck": {
+      "size": 2133824,
+      "sha256": "7c997163e6c5416a85353849d46378daed359a9f5abf1518f0e8ad8e0568c452"
+    },
+    "docs/games/pikachu-volleyball/audio.js": {
+      "size": 2825,
+      "sha256": "3d37a0a5ba7154d1400cf3fa8bad5f6a3438f396ce8930e344134ee267a65941"
+    },
+    "docs/games/pikachu-volleyball/audio/WAVE140_1.wav": {
+      "size": 27736,
+      "sha256": "7d870fc1e1ebb13c88b8af85e485411fd3cc820628c2ccf78e236516e70ced42"
+    },
+    "docs/games/pikachu-volleyball/audio/WAVE141_1.wav": {
+      "size": 11822,
+      "sha256": "ee88b87d33b7ebb5e0fe1822de11b4490ce78ead81c55a42ee37d02d86a22ade"
+    },
+    "docs/games/pikachu-volleyball/audio/WAVE142_1.wav": {
+      "size": 10622,
+      "sha256": "b66e64831390ab771fe2e6b4aea37a3715db1c8d340625382044e75250fc9899"
+    },
+    "docs/games/pikachu-volleyball/audio/WAVE145_1.wav": {
+      "size": 7058,
+      "sha256": "8ec56a6fe8558b88359adb0870c1ee854b5026a5d6ef59d09c1dbe9080ff8387"
+    },
+    "docs/games/pikachu-volleyball/audio/WAVE146_1.wav": {
+      "size": 8154,
+      "sha256": "90180d6a8f284281198abed24e0a3c10bf9dcee19b586e2fa754a62ea0ca415e"
+    },
+    "docs/games/pikachu-volleyball/audio/bgm.mp3": {
+      "size": 2000603,
+      "sha256": "0f407feb7897595d479f50bb58dbf414227c17c1ddf1a07c61baba32fcc74c16"
+    },
+    "docs/games/pikachu-volleyball/controls-wasd-r3.pck": {
+      "size": 2132272,
+      "sha256": "c92e3a7e743859e02209a569a4922a059b9fb0f6cd91253a5c7fdea38e83eb50"
+    },
+    "docs/games/pikachu-volleyball/dual-v1.pck": {
+      "size": 2133488,
+      "sha256": "257b944c0bb6fbbfaea9f291669f2b99ed0461d0356bb2088642a222fe1a2f18"
+    },
+    "docs/games/pikachu-volleyball/font-LICENSE.txt": {
+      "size": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+    },
+    "docs/games/pikachu-volleyball/index.apple-touch-icon.png": {
+      "size": 11952,
+      "sha256": "9b374ecbc8558f480421e646f38aaa8a69d5b1d65ff7b48d0735da214c46773a"
+    },
+    "docs/games/pikachu-volleyball/index.audio.position.worklet.js": {
+      "size": 3149,
+      "sha256": "347b512529c5dca302093f7b9de6d184dd09d10e9a6fba62cbab098a891b2368"
+    },
+    "docs/games/pikachu-volleyball/index.audio.worklet.js": {
+      "size": 7298,
+      "sha256": "5b476a9c9ce642c0ee4256436d1bc31d9c38f868aca0f9a8e2a57c18d2dec2a3"
+    },
+    "docs/games/pikachu-volleyball/index.html": {
+      "size": 6111,
+      "sha256": "69c2ea34fbc9f6116420c63776d25e0c618447599aaecb5f0f5b1779c34da93f"
+    },
+    "docs/games/pikachu-volleyball/index.icon.png": {
+      "size": 5702,
+      "sha256": "08808dd5397e9a502cb3624944151f87a9705b5b66b5c365c5ca4c6ab51525f5"
+    },
+    "docs/games/pikachu-volleyball/index.js": {
+      "size": 317142,
+      "sha256": "19eb180d568bb8e17bcf4c72ca034ed3af44deeb90304deefee4e665562dfe31"
+    },
+    "docs/games/pikachu-volleyball/index.pck": {
+      "size": 2131712,
+      "sha256": "ded8cdee84c30eeeb1f6dbf7edb2caf7e64caa1c2d8a3140c4673cb5e0feabc9"
+    },
+    "docs/games/pikachu-volleyball/index.png": {
+      "size": 21443,
+      "sha256": "3cb4495c0b98dfbe4b663cbf2b6836473572339beb66d902367893162a70be0e"
+    },
+    "docs/games/pikachu-volleyball/index.wasm": {
+      "size": 43682606,
+      "sha256": "60e0c995c94fc53192ac43727948f10ba52aac640b61f0e78783945146da1e22"
+    },
+    "docs/games/pikachu-volleyball/locales-v1.pck": {
+      "size": 2210576,
+      "sha256": "01050cfe31321fb46b97206ce4541d243da85fef9e3b91d3eae36f374c326ec5"
+    },
+    "docs/games/pikachu-volleyball/locales-v2.pck": {
+      "size": 2210608,
+      "sha256": "27a7f9c8c2aa9c48e576462fe9e01205db3f8f0e775c1ee30710e2c6eb9dbb7e"
+    },
+    "docs/games/pikachu-volleyball/mobile-v1.pck": {
+      "size": 2133376,
+      "sha256": "e0265585188a4ff84c35fdd228792b3a793f6c0516c98e449a3b6c553103053b"
+    },
+    "docs/games/pikachu-volleyball/p2-fix-v1.pck": {
+      "size": 2133568,
+      "sha256": "60eca985807a730c46e6208bda96bab697f0b6e49d795b35454bdb24bcbdcdb6"
+    },
+    "docs/games/snake/app.js": {
+      "size": 5260,
+      "sha256": "2638b88fd3ab38843b56577f832098e99ec2bd49d42bef644b81edd54a4b62ef"
+    },
+    "docs/games/snake/audio.js": {
+      "size": 3535,
+      "sha256": "8e740a8b07d55272d1bae721c8c0d9fb57557fd49861eefd88a9c0c942d33fab"
+    },
+    "docs/games/snake/engine.js": {
+      "size": 1503,
+      "sha256": "ab7d99e0ca15ad9755efd8eec3845e45144a9046bd10400e3110935e05a590f3"
+    },
+    "docs/games/snake/index.html": {
+      "size": 2260,
+      "sha256": "50a4c4631d71ea09a394ebbe90d2e568d86eb4acf8adc984c319284b84cdb925"
+    },
+    "docs/games/snake/music.js": {
+      "size": 2977,
+      "sha256": "73502dc402b3bd759f91a8874cd4bfd21cd925a982a8ca741b3a32c4c19eb1c0"
+    },
+    "docs/games/snake/style.css": {
+      "size": 6394,
+      "sha256": "4ee3873f511567839c6eaa61de9b2b6287e175fefe0aecc68e5a3757a59003be"
+    },
+    "docs/i18n.js": {
+      "size": 40966,
+      "sha256": "fe19f4b8702dd8e4dfb5e9ee751b00a50d5ab0a86bb821911fab92b336dfb85a"
+    },
+    "docs/index.html": {
+      "size": 10084,
+      "sha256": "48d90f74ba8866bd23570e4ea32e74156c724ed440d2fa236031ae86547abcc5"
+    },
+    "docs/mobile.js": {
+      "size": 5711,
+      "sha256": "cd72aee92fe0f7443786e986d92fe251fe4be43ec649c12ddb8bbd406ab3d13d"
+    },
+    "docs/orientation.js": {
+      "size": 2386,
+      "sha256": "257dc8497589171ddea738e481a4c96f3600c918461ba8c737f9ee3820b7c624"
+    },
+    "i18n-runtime.js": {
+      "size": 4232,
+      "sha256": "5240481e2f27ad03e5958396dd9764a4842597e8e8792fcb404cc6862c42dd91"
+    },
+    "preview.mjs": {
+      "size": 945,
+      "sha256": "ad64402f25fbcfd3d296a4d40b4d3798299a33b4d064d15822ea8993f58da4ac"
+    },
+    "tests/arcade.test.cjs": {
+      "size": 5834,
+      "sha256": "969e34e6a9b2a58d7d0f18172d34601d6f14a78dae7c93f8e55dda10b590c5e6"
+    },
+    "tests/i18n.test.cjs": {
+      "size": 1902,
+      "sha256": "c91db2d3d4f1de457cbd25194bc57e51e1e1a14acffdb58fd6843ba1516b77e9"
+    },
+    "tests/mobile.test.cjs": {
+      "size": 2483,
+      "sha256": "96f187cdf6f4ba3cd2ba25ae88ba7c6607db870890f4d23d8c6a172382b8eb3a"
+    },
+    "tests/orientation.test.cjs": {
+      "size": 1411,
+      "sha256": "f5fb0dd0d4a0ff16d2bc79dba4e97fcdcaacd5436d5f85a51486609656be4744"
+    }
+  },
+  "intentionally_updated_original_files": [
+    ".gitignore",
+    "README.md"
+  ]
+}
