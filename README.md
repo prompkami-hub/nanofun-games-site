@@ -12,7 +12,7 @@ The Godot source is maintained separately in the private `prompkami-hub/nanofun-
 ## Server wallet
 The homepage uses the dedicated private NanoFun Google Sheet and Apps Script Web App. Guests receive five welcome coins, tracked by a random browser ID and a server ledger. Email sign-in uses a ten-minute one-time code and carries only unspent guest coins to a new verified account. Verified accounts can claim ten coins once per Los Angeles calendar day. No email address is accepted as authentication by itself.
 
-All three game cabinets await server authorization before starting or restarting. Each request has a durable operation UUID, so retries recover a pending round without charging twice. Opening a cabinet, pausing and resuming are free. Purchases, the annual subscription and rewarded ads remain disabled pending payment reconciliation and ad approval. See [backend setup](apps-script/README.md).
+All three game cabinets await server authorization before starting or restarting. Each request has a durable operation UUID, so retries recover a pending round without charging twice. Opening a cabinet, pausing and resuming are free. Verified-email wallets support the 50-coin pack ($0.99 one-time), annual VIP ($9.99/year until canceled), restore purchases and transactional email confirmations. Rewarded ads remain disabled pending provider approval and durable reward verification. See [backend setup](apps-script/README.md).
 
 ## Phone controls
 `mobile.js` provides independent multi-pointer buttons outside the court. Portrait places controls below the court; short landscape places them beside it. Single player shows P1; local two-player shows P1 and P2. Move, jump and smash can be held/tapped together. Rotation or hiding the page pauses play; the large pause/resume button resumes it. The Touch Controls toggle can also expose these controls on desktop.
@@ -31,3 +31,11 @@ Auto-detects ordered browser languages and supports zh-CN, en, ja, es-MX and ko.
 
 ## Rewarded-ad integration (not enabled)
 The optional `rewarded-ads.js` adapter covers the Google H5 callback lifecycle and is not loaded by the homepage. Fake timer rewards have been removed. AdSense and AdMob applications are under review; H5 Games Ads approval and durable server reward integration are still required. Target reward: +3 coins, up to eight daily, only after explicit consent and a completed rewarded ad. No advertising revenue is claimed.
+
+
+## Public billing release
+The homepage includes three clear options (free coins, coin pack, Annual VIP), five-language purchase messages, and separate help/billing and privacy pages. Existing annual subscriptions cannot accidentally start a second subscription; the wallet provides the support cancellation/renewal link. Stripe verifies orders before credit, uses the exact NanoFun links, and never accepts a success query flag as proof. Real-card live-mode self-testing is not used.
+
+`releaseNanoFunPublicBilling` in the editor-only AdminChecks.gs requires live read checks, exact product/redirect checks, the installed reconciliation trigger, two verified isolated sandbox orders and both sent test receipts. It enables coin packs, annual VIP and the production transactional outbox together. It does not enable ads, change secrets, create transactions, add schedules or widen deployment access. Public Web App deployment remains execute-as-owner/Anyone on the existing endpoint; the underlying Sheet stays private.
+
+Customer information: [billing help](https://nanofungames.com/help.html#billing), [renewal/cancellation](https://nanofungames.com/help.html#cancel), [privacy](https://nanofungames.com/privacy.html). Advertising status must be read from the current Google dashboard, not inferred from ads.txt or a publisher ID. AdSense review and H5 Games Ads access are separate gates; the homepage does not load an advertising SDK while pending.

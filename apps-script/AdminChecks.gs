@@ -92,3 +92,22 @@ function sendNanoFunSandboxReceipts(){
   }
   console.log(JSON.stringify({test_receipts_sent:sent,production_delivery_enabled:false}));
 }
+
+// Run only for the user's explicit public release request. No key is created,
+// no charge is made, and no access scope or deployment audience is changed.
+function releaseNanoFunPublicBilling(){
+  nfValidateBillingConfiguration();
+  const props=PropertiesService.getScriptProperties();
+  const summary=JSON.parse(props.getProperty('sandbox_last_summary')||'{}');
+  if(summary.verified!==2||summary.test_coin_balance!==50||summary.annual_vip_verified!==true||summary.production_wallet_touched!==false)throw Error('sandbox_acceptance_required');
+  const sheet=SpreadsheetApp.openById(NF_SHEET_ID).getSheetByName('SandboxAcceptance');
+  if(!sheet||sheet.getLastRow()!==3)throw Error('sandbox_receipts_required');
+  const rows=sheet.getRange(2,1,2,7).getValues();
+  if(!['coins_50','vip_initial'].every(kind=>rows.some(r=>r[1]===kind&&r[4]==='sent')))throw Error('sandbox_receipts_required');
+  if(!ScriptApp.getProjectTriggers().some(t=>t.getHandlerFunction()==='reconcileNanoFunBilling'))throw Error('reconciliation_trigger_required');
+  setupNanoFunReceipts();
+  props.setProperties({BILLING_ENABLED:'true',VIP_CHECKOUT_ENABLED:'true',RECEIPT_EMAIL_ENABLED:'true'});
+  props.deleteProperty('BILLING_TEST_EMAIL');
+  props.setProperty('public_billing_released_at',new Date().toISOString());
+  console.log(JSON.stringify({public_checkout_enabled:true,annual_vip_enabled:true,receipt_delivery_enabled:true,ads_enabled:false,real_payment_created:false}));
+}

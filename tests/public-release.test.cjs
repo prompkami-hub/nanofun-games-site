@@ -1,0 +1,9 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),{test}=require('node:test');
+test('Public billing release requires isolated paid-order evidence, both sent receipts and an actual reconciliation trigger',()=>{
+ const props=new Map([['BILLING_TEST_EMAIL','__awaiting_sandbox_acceptance__']]);let rows=[['cs_test_a','coins_50',50,0,'sent'],['cs_test_b','vip_initial',0,1900000000000,'sent']],triggers=[];
+ const b={console:{log(){}},PropertiesService:{getScriptProperties:()=>({getProperty:k=>props.get(k),setProperty:(k,v)=>props.set(k,v),setProperties:o=>Object.entries(o).forEach(([k,v])=>props.set(k,v)),deleteProperty:k=>props.delete(k)})},SpreadsheetApp:{openById:()=>({getSheetByName:()=>({getLastRow:()=>rows.length+1,getRange:()=>({getValues:()=>rows})})})},ScriptApp:{getProjectTriggers:()=>triggers}};
+ vm.runInNewContext(fs.readFileSync('apps-script/Code.gs','utf8')+'\n'+fs.readFileSync('apps-script/AdminChecks.gs','utf8'),b);b.nfValidateBillingConfiguration=()=>{};b.setupNanoFunReceipts=()=>props.set('RECEIPT_OUTBOX_READY','true');
+ assert.throws(()=>b.releaseNanoFunPublicBilling(),/sandbox_acceptance/);assert.equal(props.has('RECEIPT_EMAIL_ENABLED'),false);
+ props.set('sandbox_last_summary',JSON.stringify({verified:2,test_coin_balance:50,annual_vip_verified:true,production_wallet_touched:false}));rows[1][4]='delivery_unknown';assert.throws(()=>b.releaseNanoFunPublicBilling(),/sandbox_receipts/);rows[1][4]='sent';assert.throws(()=>b.releaseNanoFunPublicBilling(),/trigger_required/);triggers=[{getHandlerFunction:()=> 'reconcileNanoFunBilling'}];
+ b.releaseNanoFunPublicBilling();assert.equal(props.has('BILLING_TEST_EMAIL'),false);for(const k of ['BILLING_ENABLED','VIP_CHECKOUT_ENABLED','RECEIPT_EMAIL_ENABLED'])assert.equal(props.get(k),'true');assert.equal(props.has('ADS_ENABLED'),false);
+});

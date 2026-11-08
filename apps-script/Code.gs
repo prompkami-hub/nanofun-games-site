@@ -21,7 +21,7 @@ function setup() {
   });
 }
 function nfJson(value){return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);}
-function doGet(){return nfJson({service:'nanofun-wallet',schema:4,version:'receipt-outbox-4',paid_enabled:PropertiesService.getScriptProperties().getProperty('BILLING_ENABLED')==='true'&&!PropertiesService.getScriptProperties().getProperty('BILLING_TEST_EMAIL'),ads_enabled:false});}
+function doGet(){return nfJson({service:'nanofun-wallet',schema:5,version:'public-billing-5',paid_enabled:PropertiesService.getScriptProperties().getProperty('BILLING_ENABLED')==='true'&&!PropertiesService.getScriptProperties().getProperty('BILLING_TEST_EMAIL'),ads_enabled:false});}
 function doPost(e){
   try {
     const raw=e&&e.postData&&e.postData.contents;
@@ -136,7 +136,7 @@ function nfWallet(id){
   const vipReady=coinReady&&properties.getProperty('VIP_CHECKOUT_ENABLED')==='true'&&!players[index][6];
   const email=String(players[index][1]),parts=email.split('@');
   const day=Utilities.formatDate(new Date(),'America/Los_Angeles','yyyyMMdd');
-  return {ok:true,player_id:id,kind:guest?'guest':'email',email_label:guest?'Guest':parts[0].slice(0,2)+'***@'+parts[1],coins:Math.max(0,coins),coin_adjustment_pending:Math.max(0,-coins),vip_expires_at:until||null,is_vip:until>Date.now(),daily_available:!guest&&!entries.some(r=>r[0]==='daily:'+id+':'+day),paid_enabled:coinReady,checkout_ready:{coins_50:coinReady,vip_year:vipReady},ads_enabled:false};
+  return {ok:true,player_id:id,kind:guest?'guest':'email',email_label:guest?'Guest':parts[0].slice(0,2)+'***@'+parts[1],coins:Math.max(0,coins),coin_adjustment_pending:Math.max(0,-coins),vip_expires_at:until||null,is_vip:until>Date.now(),has_subscription:!!players[index][6],daily_available:!guest&&!entries.some(r=>r[0]==='daily:'+id+':'+day),paid_enabled:coinReady,checkout_ready:{coins_50:coinReady,vip_year:vipReady},ads_enabled:false};
 }
 function nfDaily(id){
   const row=nfRows('Players').find(r=>r[0]===id);
@@ -299,6 +299,13 @@ function reconcileNanoFunBilling(){
   props.setProperty('billing_last_summary',JSON.stringify({...summary,at:new Date().toISOString()}));console.log(JSON.stringify(summary));return summary;
 }
 function installNanoFunBilling(){
+  nfValidateBillingConfiguration();
+  const props=PropertiesService.getScriptProperties();
+  props.setProperty('BILLING_TEST_EMAIL','pawfunstudios@gmail.com');
+  props.setProperty('BILLING_ENABLED','true');
+  console.log('Owner-only 50-coin payment acceptance enabled; public checkout and annual VIP remain closed.');
+}
+function nfValidateBillingConfiguration(){
   const checks=verifyStripeConnection();if(Object.values(checks).some(c=>!c.ok||c.url_matches===false||c.active===false))throw Error('stripe_readiness_failed');
   Object.entries(NF_LINKS).forEach(([plan,id])=>{
     const link=nfStripe('payment_links/'+id+'?expand[]=line_items');
@@ -308,9 +315,6 @@ function installNanoFunBilling(){
   });
   const props=PropertiesService.getScriptProperties();
   if(props.getProperty('BILLING_TRIGGER_CONFIRMED')!=='true')throw Error('reconciliation_trigger_required');
-  props.setProperty('BILLING_TEST_EMAIL','pawfunstudios@gmail.com');
-  props.setProperty('BILLING_ENABLED','true');
-  console.log('Owner-only 50-coin payment acceptance enabled; public checkout and annual VIP remain closed.');
 }
 
 function confirmNanoFunBillingTrigger(){

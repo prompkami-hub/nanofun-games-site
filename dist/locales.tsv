@@ -240,3 +240,54 @@ VIP 畅玩，本局不扣能量。	VIP play. No coin charged.	VIPプレイ。コ
 付费补能、年度通行证和真实激励广告尚未开放。开放时间将在本页公布。	Coin purchases, annual passes and rewarded ads are not available yet. Availability will be announced here.	コイン購入、年間パス、報酬広告は準備中です。開始時期はこのページでお知らせします。	Las compras, el pase anual y los anuncios con recompensa aún no están disponibles. Su activación se anunciará aquí.	코인 구매, 연간 패스, 보상 광고는 준비 중입니다. 출시 일정은 이 페이지에서 안내합니다.
 NanoFun 使用 Google Apps Script 与私有 Google Sheet 保存邮箱、余额和开局记录。验证码有效 10 分钟；登录会话保存在本机浏览器，退出可移除本机会话。游客记录依赖本机随机标识，清理浏览器数据可能丢失；邮箱账户可重新登录恢复。	NanoFun stores email, balances and game starts in a private Google Sheet using Apps Script. Codes expire after 10 minutes. Signing out removes this browser's session. Clearing browser data may lose guest access; email accounts can sign in again to recover.	NanoFunはApps Scriptと非公開Google Sheetでメール・残高・開始履歴を保存します。コードは10分間有効。ログアウトで端末のセッションを削除します。ブラウザデータ削除でゲスト情報にアクセスできなくなる場合があります。メールアカウントは再ログインで復元できます。	NanoFun guarda correo, saldo e inicios en una hoja privada de Google con Apps Script. Los códigos duran 10 minutos. Cerrar sesión elimina la sesión local. Borrar datos del navegador puede perder el acceso de invitado; las cuentas de correo pueden recuperarse al iniciar sesión.	NanoFun은 Apps Script와 비공개 Google Sheet에 이메일, 잔액, 시작 기록을 저장합니다. 코드는 10분 유효하며 로그아웃하면 기기 세션이 삭제됩니다. 브라우저 데이터 삭제 시 게스트 접근을 잃을 수 있으나 이메일 계정은 다시 로그인하여 복원할 수 있습니다.
 游戏为非官方二创，保留原素材署名。当前能量没有现金价值，不提供提现。	Games are unofficial adaptations with original credits retained. Coins have no cash value and cannot be withdrawn.	ゲームは非公式の二次創作で原素材の表記を保持します。コインに現金価値はなく換金できません。	Juegos no oficiales que conservan los créditos originales. Las monedas no tienen valor en efectivo ni pueden retirarse.	게임은 원본 크레딧을 보존하는 비공식 2차 창작입니다. 코인은 현금 가치가 없으며 출금할 수 없습니다.
+先领 5 枚能量 · 每日免费领取 · 按需购买，轻松畅玩	Start with 5 coins · Free daily coins · Top up your way	まずは5コイン · 毎日無料 · 必要な分だけ購入	Empieza con 5 monedas · Monedas gratis diarias · Recarga a tu ritmo	코인 5개로 시작 · 매일 무료 코인 · 필요할 때 충전
+能量与 VIP	Coins & VIP	コインとVIP	Monedas y VIP	코인과 VIP
+玩多少，由你选。	Your arcade. Your way to play.	遊び方は、あなた次第。	Tu arcade. Tú decides cómo jugar.	원하는 만큼 즐기세요.
+安全支付由 Stripe 提供	Secure checkout by Stripe	Stripeの安全な決済	Pago seguro con Stripe	Stripe 보안 결제
+先免费玩	Start free	無料で始める	Empieza gratis	무료로 시작
+开始体验	to get started	まずは体験	para empezar	첫 체험
+首次 5 枚能量，验证邮箱后每日可领 10 枚。	Start with 5 coins. Verify your email to claim 10 daily.	初回5コイン。メール確認後は毎日10コイン。	Empieza con 5 monedas. Verifica tu correo para recibir 10 al día.	첫 코인 5개. 이메일 인증 후 매일 10개를 받으세요.
+每次开始或重开使用 1 枚	1 coin per new game or restart	開始・再開ごとに1コイン	1 moneda por juego nuevo o reinicio	새 게임 또는 재시작 시 코인 1개
+暂停与继续不扣能量	Pause and resume for free	一時停止・続行は無料	Pausar y continuar es gratis	일시 정지 및 계속하기 무료
+无需绑定银行卡	No card needed to start	開始にカード不要	No necesitas tarjeta para empezar	시작 시 카드 불필요
+领取免费能量	Get free coins	無料コインを受け取る	Recibir monedas gratis	무료 코인 받기
+50 枚能量包	50 Coins Pack	50コインパック	Paquete de 50 monedas	코인 50개 팩
+USD · 一次性	USD · one-time	USD · 1回払い	USD · pago único	USD · 일회성
+想再玩几局？随用随补，没有自动续费。	A little more play. Top up once, with no renewal.	もう少し遊びたいときに。自動更新なし。	Juega un poco más. Recarga una vez, sin renovación.	조금 더 즐기세요. 자동 갱신 없는 충전.
+一次到账 50 枚能量	50 coins added in one purchase	1回の購入で50コイン	50 monedas por compra	한 번 구매로 코인 50개
+同一邮箱登录，跨设备恢复	Restore across devices with the same email	同じメールで端末をまたいで復元	Restaura en otros dispositivos con el mismo correo	같은 이메일로 다른 기기에서 복원
+核验到账后发送邮件回执	Email confirmation after verification	確認後に購入メールを送信	Confirmación por correo tras verificar el pago	결제 확인 후 이메일 영수증 발송
+选择能量包	Choose the coin pack	コインパックを選ぶ	Elegir paquete de monedas	코인 팩 선택
+年度 VIP	Annual VIP	年間VIP	VIP anual	연간 VIP
+USD / 年	USD / year	USD / 年	USD / año	USD / 년
+有效期内支持的游戏免能量畅玩。	Play supported games without spending coins during your paid period.	有効期間中は対応ゲームをコイン消費なしでプレイ。	Juega los títulos compatibles sin gastar monedas durante el periodo pagado.	유효 기간 동안 지원 게임을 코인 소모 없이 즐기세요.
+每年自动续费，直至取消	Renews annually until canceled	解約まで毎年自動更新	Se renueva cada año hasta cancelar	취소할 때까지 매년 자동 갱신
+取消续费保留已付有效期	Cancel renewal and keep your paid period	更新を止めても支払済み期間は有効	Cancela la renovación y conserva el periodo pagado	갱신 취소 후에도 결제한 기간 유지
+有效期内不展示续玩广告	No continuation-ad prompts during VIP	VIP期間中は続行広告の案内なし	Sin avisos de anuncios para continuar durante VIP	VIP 기간에는 이어하기 광고 안내 없음
+选择年度 VIP	Choose Annual VIP	年間VIPを選ぶ	Elegir VIP anual	연간 VIP 선택
+购买前需验证邮箱。能量无现金价值，不可提现。付款商户显示为 PromptKami，产品为 NanoFun Games。	Verify your email before purchase. Coins have no cash value and cannot be withdrawn. The payment merchant is PromptKami; the product is NanoFun Games.	購入前にメールを確認。コインは換金・出金できません。決済加盟店はPromptKami、製品はNanoFun Gamesです。	Verifica tu correo antes de comprar. Las monedas no tienen valor en efectivo ni se retiran. El comercio es PromptKami; el producto es NanoFun Games.	구매 전 이메일 인증이 필요합니다. 코인은 현금 가치가 없고 출금할 수 없습니다. 결제 가맹점은 PromptKami, 제품은 NanoFun Games입니다.
+购买与退款帮助 ↗	Purchase & refund help ↗	購入・返金のヘルプ ↗	Ayuda de compras y reembolsos ↗	구매 및 환불 도움말 ↗
+免费能量、按次补充，或年度 VIP。	Free daily coins, a one-time top-up, or Annual VIP.	毎日の無料コイン、追加購入、または年間VIP。	Monedas diarias gratis, una recarga o VIP anual.	매일 무료 코인, 일회성 충전 또는 연간 VIP.
+购买帮助	Billing help	購入ヘルプ	Ayuda de pagos	결제 도움말
+隐私说明	Privacy	プライバシー	Privacidad	개인정보 안내
+管理续费／申请取消 ↗	Manage renewal / request cancellation ↗	更新管理・解約申請 ↗	Gestionar renovación / solicitar cancelación ↗	갱신 관리 / 취소 요청 ↗
+验证邮箱后购买	Verify email to buy	メール確認後に購入	Verifica tu correo para comprar	이메일 인증 후 구매
+验证邮箱后订阅	Verify email to subscribe	メール確認後に登録	Verifica tu correo para suscribirte	이메일 인증 후 구독
+购买 50 枚能量 · $0.99	Buy 50 coins · $0.99	50コイン購入 · $0.99	Comprar 50 monedas · $0.99	코인 50개 구매 · $0.99
+订阅年度 VIP · $9.99 / 年	Subscribe to Annual VIP · $9.99 / year	年間VIP登録 · $9.99 / 年	Suscribirme a VIP anual · $9.99 / año	연간 VIP 구독 · $9.99 / 년
+年度 VIP 已生效	Annual VIP is active	年間VIP有効	VIP anual activo	연간 VIP 활성화됨
+已有订阅 · 联系客服管理	Existing subscription · Contact support	登録済み · サポートへ	Suscripción existente · Contacta a soporte	기존 구독 · 고객 지원 문의
+请在 Stripe 使用当前账户的邮箱付款。到账后会发送购买回执；未返回本站也可点击恢复购买。	Use this account’s email at Stripe checkout. You will receive a purchase confirmation after verification. Use Restore purchases if you did not return here.	Stripeではこのアカウントと同じメールで決済してください。確認後に購入メールを送信。戻らなかった場合は購入を復元できます。	Usa el correo de esta cuenta al pagar en Stripe. Recibirás confirmación tras la verificación. Usa Restaurar compras si no regresaste aquí.	Stripe 결제 시 이 계정의 이메일을 사용하세요. 확인 후 구매 영수증이 발송됩니다. 돌아오지 못했다면 구매 복원을 이용하세요.
+付款未到账、续费取消与退款帮助 ↗	Missing purchase, cancellation & refund help ↗	未反映・解約・返金のヘルプ ↗	Ayuda de compras, cancelación y reembolsos ↗	구매 미반영, 취소 및 환불 도움말 ↗
+订单已核对，账户余额与权益已同步。	Purchases checked. Your balance and access are up to date.	購入を確認し、残高と利用権を同期しました。	Compras verificadas. Tu saldo y acceso están actualizados.	구매 확인 완료. 잔액과 이용 권한이 동기화되었습니다.
+订单已核验，余额与权益已更新。购买回执会发送至付款邮箱。	Payment verified. Your balance and access are updated. A confirmation will be sent to the purchase email.	決済を確認し残高と利用権を更新しました。購入メールアドレスに確認を送信します。	Pago verificado. Saldo y acceso actualizados. Enviaremos confirmación al correo de compra.	결제가 확인되어 잔액과 이용 권한이 갱신되었습니다. 구매 이메일로 확인 메일을 보냅니다.
+退款调整：后续能量入账将抵扣 {n} 枚。这不是现金欠款。	Refund adjustment: {n} coins will offset future credits. This is not a cash debt.	返金調整：今後の入金から{n}コインを相殺します。現金の債務ではありません。	Ajuste de reembolso: se compensarán {n} monedas de futuros abonos. No es una deuda en efectivo.	환불 조정: 이후 지급 코인에서 {n}개를 상계합니다. 현금 부채가 아닙니다.
+有效期内支持的游戏免能量畅玩，并隐藏续玩广告。	Supported games use no coins during VIP; continuation-ad prompts are hidden.	VIP中は対応ゲームのコイン消費と続行広告の案内なし。	Los juegos compatibles no gastan monedas durante VIP y se ocultan los avisos de anuncios para continuar.	VIP 동안 지원 게임 코인 소모 및 이어하기 광고 안내 없음.
+验证邮箱后可购买 50 枚能量包（$0.99，一次性），或订阅年度 VIP（$9.99 / 年，自动续费直至取消）。激励广告仍在审核。	After email verification, buy 50 coins ($0.99 once) or Annual VIP ($9.99/year, renews until canceled). Rewarded ads are still under review.	メール確認後、50コイン（$0.99、1回払い）または年間VIP（$9.99/年、解約まで自動更新）を購入できます。報酬広告は審査中です。	Tras verificar tu correo, compra 50 monedas ($0.99 una vez) o VIP anual ($9.99/año, se renueva hasta cancelar). Los anuncios con recompensa siguen en revisión.	이메일 인증 후 코인 50개($0.99 일회성) 또는 연간 VIP($9.99/년, 취소 시까지 갱신)를 구매하세요. 보상형 광고는 심사 중입니다.
+请先登录邮箱，或稍后重试付款入口。	Sign in with your email, or retry checkout shortly.	メールでログインするか、後ほどお試しください。	Inicia sesión con tu correo o vuelve a intentar el pago.	이메일로 로그인하거나 잠시 후 결제를 재시도하세요.
+付款服务暂不可用，请稍后再试。	Payment service is temporarily unavailable. Try again later.	決済サービスは一時利用できません。後ほどお試しください。	El servicio de pago no está disponible. Intenta más tarde.	결제 서비스를 일시적으로 사용할 수 없습니다. 나중에 재시도하세요.
+订单核验暂不可用，请稍后点击恢复购买。	Order verification is unavailable. Try Restore purchases later.	注文確認が一時利用できません。後ほど購入を復元してください。	No se puede verificar el pedido. Intenta Restaurar compras más tarde.	주문 확인이 일시적으로 불가합니다. 나중에 구매 복원을 누르세요.
+请登录付款时使用的同一邮箱。仍未到账时，请联系客服并提供订单号。	Use the same email as your purchase. If still missing, contact support with your order reference.	購入時と同じメールでログインしてください。未反映の場合は注文番号を添えてご連絡ください。	Usa el correo de la compra. Si sigue sin aparecer, contacta a soporte con la referencia del pedido.	구매 시 이메일로 로그인하세요. 계속 미반영되면 주문 번호로 고객 지원에 문의하세요.
+付款尚未核验成功，请稍后点击恢复购买。不要重复付款。	Payment is not yet verified. Try Restore purchases later. Do not pay again.	決済が未確認です。後ほど購入を復元してください。再決済しないでください。	El pago aún no está verificado. Restaura compras más tarde. No pagues otra vez.	결제가 아직 확인되지 않았습니다. 나중에 구매를 복원하세요. 다시 결제하지 마세요.
+此账户已有订阅，请联系客服管理续费，避免重复订阅。	This account already has a subscription. Contact support to manage renewal.	登録済みです。更新管理はサポートへご連絡ください。	Esta cuenta ya tiene suscripción. Contacta a soporte para gestionar la renovación.	이미 구독 중인 계정입니다. 갱신 관리는 고객 지원에 문의하세요.
+订单仍在核对，请稍后恢复购买或联系客服。	Orders are still being checked. Restore purchases later or contact support.	注文確認中です。後ほど購入を復元するかサポートにご連絡ください。	Los pedidos siguen en revisión. Restaura compras más tarde o contacta a soporte.	주문 확인 중입니다. 나중에 구매를 복원하거나 고객 지원에 문의하세요.

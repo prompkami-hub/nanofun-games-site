@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nanofungames.com/sitemap.xml

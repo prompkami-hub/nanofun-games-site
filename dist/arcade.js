@@ -5,7 +5,7 @@
   const client=window.NanoFunWalletClient.createWalletClient({endpoint});
   let wallet=null,selectedGame='volleyball',toastTimer,loading=true,loginEmail='';
   const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=wallet1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=wallet1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=wallet1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
-  const errors={login_required:'请用邮箱登录，恢复你的账户。',invalid_code:'验证码不正确，请重新输入。',code_expired:'验证码已过期，请重新发送。',try_later:'请求较多，请稍后再试。',insufficient_coins:'能量已用完，登录后领取每日能量。',verified_email_required:'请先验证邮箱。',previous_game_round_pending:'上次开局仍待确认，请先返回上一款游戏重试。',previous_account_round_pending:'上一账户有待确认的开局，请先恢复该账户。',checkout_not_ready:'付费补能尚未开放。',stripe_not_configured:'付费补能尚未开放。'};
+  const errors={login_required:'请用邮箱登录，恢复你的账户。',invalid_code:'验证码不正确，请重新输入。',code_expired:'验证码已过期，请重新发送。',try_later:'请求较多，请稍后再试。',insufficient_coins:'能量已用完，登录后领取每日能量。',verified_email_required:'请先验证邮箱。',previous_game_round_pending:'上次开局仍待确认，请先返回上一款游戏重试。',previous_account_round_pending:'上一账户有待确认的开局，请先恢复该账户。',checkout_not_ready:'请先登录邮箱，或稍后重试付款入口。',stripe_not_configured:'付款服务暂不可用，请稍后再试。',stripe_unavailable:'订单核验暂不可用，请稍后点击恢复购买。',order_owner_mismatch:'请登录付款时使用的同一邮箱。仍未到账时，请联系客服并提供订单号。',payment_not_verified:'付款尚未核验成功，请稍后点击恢复购买。不要重复付款。',multiple_subscriptions_need_review:'此账户已有订阅，请联系客服管理续费，避免重复订阅。',billing_coverage_incomplete:'订单仍在核对，请稍后恢复购买或联系客服。'};
   const message=e=>errors[e.message]||'连接暂时失败。请重试；开局请求会核对原编号，不会重复扣币。';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),4000);}
   function render(){
@@ -19,16 +19,17 @@
     $('daily-button').textContent=wallet?.daily_available?'领取今日 10 枚能量':'今日已领取 · 明天再来';
     $('wallet-play').hidden=!(wallet?.is_vip||total>0);
     $('coins-buy').disabled=!wallet?.checkout_ready?.coins_50;
-    $('coins-buy').textContent=wallet?.checkout_ready?.coins_50?'Buy 50 coins — $0.99':'付费补能尚未开放';
+    $('coins-buy').textContent=wallet?.checkout_ready?.coins_50?'购买 50 枚能量 · $0.99':'验证邮箱后购买';
     $('restore-orders').hidden=!wallet?.paid_enabled;
-    $('payment-test-note').hidden=!wallet?.paid_enabled;
-    $('payment-test-note').textContent='Owner-only payment test. Use this same verified email at Stripe checkout. Public purchases and annual VIP are still closed.';
+    $('payment-test-note').hidden=!email;
+    $('payment-test-note').textContent='请在 Stripe 使用当前账户的邮箱付款。到账后会发送购买回执；未返回本站也可点击恢复购买。';
     $('vip-buy').disabled=!wallet?.checkout_ready?.vip_year;
-    $('vip-buy').textContent=wallet?.checkout_ready?.vip_year?'Subscribe — $9.99 / year':'年度通行证尚未开放';
+    $('vip-buy').textContent=wallet?.checkout_ready?.vip_year?'订阅年度 VIP · $9.99 / 年':wallet?.is_vip?'年度 VIP 已生效':wallet?.has_subscription?'已有订阅 · 联系客服管理':'验证邮箱后订阅';
+    $('vip-manage').hidden=!wallet?.has_subscription;
     $('reward-button').disabled=true;
     $('reward-status').textContent='广告仍在审核，暂不播放或发放广告奖励。';
     $('coin-adjustment').hidden=!wallet?.coin_adjustment_pending;
-    $('coin-adjustment').textContent=wallet?.coin_adjustment_pending?'Refund adjustment: '+wallet.coin_adjustment_pending+' coins will be offset against future coin credits. This is not a cash debt.':'';
+    $('coin-adjustment').textContent=wallet?.coin_adjustment_pending?'退款调整：后续能量入账将抵扣 '+wallet.coin_adjustment_pending+' 枚。这不是现金欠款。':'';
     $('membership-status').textContent=wallet?.is_vip?'年度 VIP 有效至 '+new Date(wallet.vip_expires_at).toLocaleDateString():email?'已验证邮箱 · 账户余额由服务器记录':'游客钱包 · 验证邮箱后可跨设备恢复';
   }
   function accept(value){wallet=value;render();}
@@ -59,10 +60,11 @@
   $('daily-button').addEventListener('click',async()=>{try{$('daily-button').disabled=true;accept((await client.daily()).wallet);$('wallet-message').textContent='今日能量已到账。';}catch(e){$('wallet-message').textContent=message(e);render();}});
   $('switch-account').addEventListener('click',()=>{client.logout();wallet=null;loginEmail='';render();$('wallet-message').textContent='已退出登录，填写邮箱恢复余额。';});
   $('restore-orders').addEventListener('click',async()=>{
-    $('restore-orders').disabled=true;try{accept((await client.restoreOrders()).wallet);$('wallet-message').textContent='Purchases checked. Your verified balance is up to date.';}catch(e){$('wallet-message').textContent=message(e);}finally{$('restore-orders').disabled=false;}
+    $('restore-orders').disabled=true;try{accept((await client.restoreOrders()).wallet);$('wallet-message').textContent='订单已核对，账户余额与权益已同步。';}catch(e){$('wallet-message').textContent=message(e);}finally{$('restore-orders').disabled=false;}
   });
   $('coins-buy').addEventListener('click',()=>{try{location.assign(client.checkoutUrl('coins_50'));}catch(e){$('wallet-message').textContent=message(e);}});
   $('vip-buy').addEventListener('click',()=>{try{location.assign(client.checkoutUrl('vip_year'));}catch(e){$('wallet-message').textContent=message(e);}});
+  document.querySelectorAll('[data-open-wallet]').forEach(button=>button.addEventListener('click',()=>openWallet()));
   $('wallet-button').addEventListener('click',()=>openWallet());$('claim-entry').addEventListener('click',()=>openWallet());$('game-wallet').addEventListener('click',()=>openWallet());
   ['how-button','privacy-button'].forEach(id=>$(id).addEventListener('click',()=>$('info-dialog').showModal()));
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
@@ -91,7 +93,7 @@
   async function verifyReturn(){
     const session=new URL(location.href).searchParams.get('session_id');if(!session)return;
     if(!wallet||wallet.kind!=='email'){openWallet('请登录付款时使用的邮箱，以核验订单。');return;}
-    try{accept((await client.verifyCheckout(session)).wallet);openWallet('订单已核验，余额已更新。');history.replaceState({},'',location.pathname+location.hash);}catch(e){openWallet(message(e));}
+    try{accept((await client.verifyCheckout(session)).wallet);openWallet('订单已核验，余额与权益已更新。购买回执会发送至付款邮箱。');history.replaceState({},'',location.pathname+location.hash);}catch(e){openWallet(message(e));}
   }
   if(new URL(location.href).searchParams.get('session_id'))ready.then(verifyReturn);
   render();
