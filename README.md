@@ -21,7 +21,7 @@ The web game polls the host touch bridge for movement and one-shot actions. Exis
 Three playable cabinets share the simulated wallet. New games keep independent sources in the games repository; only index.html, style.css, engine.js and app.js are deployed under docs/games. Each explicit start costs one coin; pause and continue are free. Leaving the cabinet ends the run. Both games support keyboard and mobile gestures; Snake also has direction buttons. Scores are browser-local.
 
 
-Guest session: sessionStorage grants five coins per tab session. Refresh preserves the count. Guest coins are spent before the existing email balance. Cabinet entry is free even at zero; the next actual start opens the wallet when both balances are empty. Existing daily and simulated-ad rewards remain available after email entry.
+Welcome grant: localStorage grants five coins once per browser profile. Refreshing, reopening and new tabs preserve the count. Existing sessionStorage balances migrate without a refill. Storage failure does not allow an unrecorded guest spend. Guest coins are spent before the existing email balance. Cabinet entry is free even at zero; the next actual start opens the wallet when both balances are empty. Existing daily and simulated-ad rewards remain available after email entry.
 
 
 ## Languages

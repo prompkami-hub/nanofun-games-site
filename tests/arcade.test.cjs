@@ -44,15 +44,36 @@ test('2048 and Snake select distinct frames and charge only on actual start',asy
  const raw=[...h.storage.values()].join('');assert.ok(raw.includes('2048开赛'));assert.ok(raw.includes('贪吃蛇开赛'));
 });
 
-test('New session grants exactly five guest plays, refresh preserves them, sixth start asks for email',async()=>{
+test('Welcome grant permits five plays, persists across tabs, and sixth start asks for email',async()=>{
  const h=harness();assert.equal(h.balance(),5);assert.equal(h.node('wallet-dialog').open,false);
  h.click('play-snake');assert.equal(h.node('wallet-dialog').open,false);
  for(let i=0;i<5;i++){assert.equal(h.window.NanoArcade.requestMatch(),true);assert.equal(h.node('wallet-dialog').open,false);}
  assert.equal(h.balance(),0);assert.equal(h.window.NanoArcade.requestMatch(),false);assert.equal(h.node('wallet-dialog').open,true);assert.equal(h.node('email-form').hidden,false);
  const refreshed=harness(h.storage,h.session);assert.equal(refreshed.balance(),0);assert.equal(refreshed.node('wallet-dialog').open,false);refreshed.click('play-2048');assert.equal(refreshed.node('wallet-dialog').open,false);assert.equal(refreshed.window.NanoArcade.requestMatch(),false);
  await refreshed.login('guest-test@example.com');assert.equal(refreshed.balance(),10);refreshed.node('wallet-dialog').close();assert.equal(refreshed.window.NanoArcade.requestMatch(),true);assert.equal(refreshed.balance(),9);
- const newSession=harness(h.storage);assert.equal(newSession.balance(),14,'new five guest coins plus existing nine account coins');
+ const newSession=harness(h.storage);assert.equal(newSession.balance(),9,'new tab does not refill the welcome grant');
 });
 test('Guest coins cannot unlock ads early and are not refilled by identity switching',async()=>{
  const h=harness();await h.login('early@example.com');assert.equal(h.balance(),15);h.click('reward-button');assert.equal(h.balance(),15);h.click('play-snake');h.window.NanoArcade.requestMatch();assert.equal(h.balance(),14);h.click('switch-account');assert.equal(h.balance(),4);assert.equal(harness(h.storage,h.session).balance(),4);
+});
+
+ test('Welcome balance is shared between tabs and migration does not refill used coins',()=>{
+ const store=new Map(),a=harness(store),b=harness(store);
+ a.click('play-snake');b.click('play-2048');
+ for(let i=0;i<5;i++)assert.equal((i%2?a:b).window.NanoArcade.requestMatch(),true);
+ assert.equal(a.window.NanoArcade.requestMatch(),false);
+ assert.equal(b.window.NanoArcade.requestMatch(),false);
+ assert.equal(a.balance(),0);assert.equal(b.balance(),0);
+ assert.equal(harness(store).balance(),0);
+ const migrated=harness(new Map(),new Map([["nanofun.arcade.guest.v1",'{"coins":2}']]));
+ assert.equal(migrated.balance(),2);assert.equal(harness(migrated.storage).balance(),2);
+ const corrupt=harness(new Map([["nanofun.arcade.guest.v1",'bad json']]));
+ assert.equal(corrupt.balance(),0);
+ });
+
+test('Guest starts fail closed when storage cannot persist a spend',()=>{
+ const store=new Map();const h=harness(store);assert.equal(h.balance(),5);h.click('play-snake');
+ store.set=()=>{throw new Error('quota exceeded');};
+ assert.equal(h.window.NanoArcade.requestMatch(),false);
+ assert.equal(JSON.parse(store.get('nanofun.arcade.guest.v1')).coins,5);
 });

@@ -3,11 +3,32 @@
   const $ = id => document.getElementById(id);
   const STORAGE = 'nanofun.arcade.demo.v1';
   const GUEST = 'nanofun.arcade.guest.v1';
-  let guest=5;
-  try{const saved=sessionStorage.getItem(GUEST);if(saved!==null){const value=JSON.parse(saved);guest=Number.isInteger(value.coins)&&value.coins>=0&&value.coins<=5?value.coins:0;}else sessionStorage.setItem(GUEST,JSON.stringify({coins:5}));}catch{}
-  function guestCoins(){return guest;}
+  // A one-time browser-local welcome grant. Not a paid-entitlement ledger.
+  function guestCoins() {
+    try {
+      let saved=localStorage.getItem(GUEST);
+      if(saved===null){
+        // Preserve the remaining balance of an existing tab during migration.
+        const legacy=sessionStorage.getItem(GUEST);
+        const value=legacy===null?{coins:5}:JSON.parse(legacy);
+        const coins=Number.isInteger(value?.coins)&&value.coins>=0&&value.coins<=5?value.coins:0;
+        localStorage.setItem(GUEST,JSON.stringify({coins}));
+        saved=localStorage.getItem(GUEST);
+      }
+      const value=JSON.parse(saved);
+      return Number.isInteger(value?.coins)&&value.coins>=0&&value.coins<=5?value.coins:0;
+    } catch { return 0; }
+  }
   function balance(){return guestCoins()+(account()?.coins||0);}
-  function spendCoin(reason){if(guest>0){const next=guest-1;try{sessionStorage.setItem(GUEST,JSON.stringify({coins:next}));}catch{}guest=next;render();return true;}return transaction(-1,reason,a=>a.coins>=1);}
+  function spendCoin(reason){
+    const coins=guestCoins();
+    if(coins>0){
+      try{localStorage.setItem(GUEST,JSON.stringify({coins:coins-1}));}
+      catch{toast('浏览器无法保存模拟币，请允许本地存储后再试。');return false;}
+      render();return true;
+    }
+    return transaction(-1,reason,a=>a.coins>=1);
+  }
   const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=locales2',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=sound1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=music1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
   let selectedGame = 'volleyball';
   let active = null, toastTimer, storageOK = true;
@@ -41,7 +62,8 @@
     ['header-balance','cabinet-coins','wallet-balance'].forEach(id=>$(id).textContent=total);
     $('email-form').hidden=!!a; $('account-panel').hidden=!a;
     $('wallet-play').hidden=total<1;
-    $('guest-status').textContent=guest>0?'本会话还剩 '+guest+' 枚游客币，直接选游戏就能玩。':'游客币已用完。填写邮箱，每天领取 10 枚模拟币。';
+    const guest=guestCoins();
+    $('guest-status').textContent=guest>0?'本机还剩 '+guest+' 枚游客币，直接选游戏就能玩。':'游客币已用完。填写邮箱，每天领取 10 枚模拟币。';
     if(!a) return;
     $('account-label').textContent=a.label+' · 演示身份';
     $('daily-button').disabled=a.day===today();
@@ -65,7 +87,7 @@
   });
   $('switch-account').addEventListener('click',()=>{const store=readStore();delete store.active;if(!writeStore(store))return;active=null;render();$('wallet-message').textContent='切换本机演示身份；原身份余额仍保留。';});
   $('daily-button').addEventListener('click',dailyClaim);
-  $('reward-button').addEventListener('click',()=>{if(transaction(10,'模拟广告奖励',a=>a.coins===0&&guest===0)){$('wallet-message').textContent='模拟奖励已到账：＋10 币。本次未播放真实广告。';toast('模拟奖励 ＋10 币 · 无真实广告');}});
+  $('reward-button').addEventListener('click',()=>{if(transaction(10,'模拟广告奖励',a=>a.coins===0&&guestCoins()===0)){$('wallet-message').textContent='模拟奖励已到账：＋10 币。本次未播放真实广告。';toast('模拟奖励 ＋10 币 · 无真实广告');}});
   $('wallet-button').addEventListener('click',()=>openWallet());
   $('claim-entry').addEventListener('click',()=>{openWallet();if(account())dailyClaim();});
   ['how-button','privacy-button'].forEach(id=>$(id).addEventListener('click',()=>$('info-dialog').showModal()));
@@ -97,6 +119,6 @@
     if(!spendCoin(games[selectedGame].name+'开赛')){openWallet(!account()?'5 枚游客币已用完。填写邮箱领取每日 10 币，再继续玩。':storageOK?'模拟币用完啦，领取可用奖励后继续玩。':'当前无法保存余额，暂时不能开赛。');return false;}
     $('game-status').textContent='已投 1 枚模拟币，'+games[selectedGame].paid+'重开另扣 1 币。';toast('已投币 −1 · 祝你玩得开心！');return true;
   }});
-  window.addEventListener('storage',event=>{if(event.key===STORAGE)render();});
+  window.addEventListener('storage',event=>{if(event.key===STORAGE||event.key===GUEST||event.key===null)render();});
   active=readStore().active||null;render();
 })();

@@ -7,7 +7,7 @@ test('Language auto detection uses ordered browser preferences, region aliases a
 test('Every phrase has all five locales, no duplicate keys, and numeric templates interpolate',()=>{
  assert.equal(new Set(rows.map(r=>r[0].trim())).size,rows.length);
  for(const row of rows){assert.equal(row.length,5);assert.ok(row.every(x=>x.trim().length));for(const lang of ['en','ja','es-MX','ko'])assert.notEqual(translate(row[0],lang),undefined);}
- assert.equal(translate('本会话还剩 5 枚游客币，直接选游戏就能玩。','en'),'5 guest coins left this session. Pick a game and play.');
+ assert.equal(translate('本机还剩 5 枚游客币，直接选游戏就能玩。','en'),'5 welcome coins left in this browser. Pick a game and play.');
  assert.equal(translate('长度 3 · 速度 2','ko'),'길이 3 · 속도 2');
  assert.equal(translate('本局 120 分 · 长度 15。再挑战一次？','es-MX'),'Puntos: 120 · Longitud: 15. ¿Otra vez?');
  assert.equal(translate('音效：开','zh-CN'),'音效：开');assert.equal(translate('2048','ja'),'2048');
