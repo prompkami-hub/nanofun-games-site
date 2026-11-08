@@ -41,5 +41,6 @@ The homepage includes three clear options (free coins, coin pack, Annual VIP), f
 Customer information: [billing help](https://nanofungames.com/help.html#billing), [renewal/cancellation](https://nanofungames.com/help.html#cancel), [privacy](https://nanofungames.com/privacy.html). Advertising status must be read from the current Google dashboard, not inferred from ads.txt or a publisher ID. AdSense review and H5 Games Ads access are separate gates; the homepage does not load an advertising SDK while pending.
 
 
-## Sender migration hold
-The ee brand's sole public contact and required mail sender is superpowergames.us@gmail.com. The legacy internal-account sending path is blocked. New login mail, new checkout and customer receipt sending are temporarily paused until the ee-owned mail relay is authorized, privately paired and its real From header verified. Existing guest/verified wallets and game balances remain usable. See apps-script/ee-mail-sender/README.md. This latest hold supersedes the earlier public-billing release description; do not mark the migration complete from a Google browser login alone.
+## EE brand mail verified; billing restored
+
+The ee-owned mail relay is authorized, privately paired and deployed. An actual inbox test verified both From and Reply-To as superpowergames.us@gmail.com (NanoFun Games), signed by gmail.com. Wallet deployment 8 / schema7 ee-mail-relay-7 uses brand_relay; paid_enabled=true and ads_enabled=false. The production coin-pack and annual-VIP controls are enabled. Existing private player/Stripe administration remains separate from public sender identity. No real-money self-purchase was performed. Secret values are absent from source and logs.

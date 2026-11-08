@@ -83,3 +83,8 @@ All customer-facing contact, login and purchase messages must use superpowergame
 
 ## Narrow ee mail relay (prepared, awaiting owner authorization)
 The wallet backend no longer needs to send customer mail itself. Its prepared transport signs HTTPS requests to the ee-owned, mail-only app in ee-mail-sender/. The relay requires its effective execution account to equal the brand address; it has no player-table/payment access. Two private Script Properties pair the services: MAIL_RELAY_URL and MAIL_RELAY_SECRET. The owner must create/copy/save the new secret privately. OUTBOUND_IDENTITY_CONFIRMED remains absent until actual sender acceptance. The active interim API is schema6/ee-sender-gate-6; the prepared relay API is schema7/ee-mail-relay-7, and the confirm helper refuses to reopen checkout against the old direct-mail deployment.
+
+
+## Brand sender acceptance complete
+
+The ee mail-only deployment 1 is authorized and privately paired with wallet deployment 8/schema7 ee-mail-relay-7. The sender-verification probe was accepted and read in the ee inbox: From NanoFun Games <superpowergames.us@gmail.com>, Reply-To the same address, signed-by gmail.com. confirmEeSenderAfterAcceptance completed only after header verification. Live health paid_enabled=true, ads_enabled=false; both coin-pack and annual-VIP controls are enabled. This supersedes the interim hold above. No production payment was submitted. The owner created and saved MAIL_RELAY_SECRET privately; no secret values were read or logged by the agent.
