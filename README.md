@@ -9,8 +9,10 @@ Edit the homepage files in `dist/`, copy them to `docs/`, then run `node preview
 
 The Godot source is maintained separately in the private `prompkami-hub/nanofun-games` repository under `pikachu-volleyball/`. Only web exports belong in `docs/games/pikachu-volleyball/`. Use a new pack filename and update the HTML mainPack and cache versions when deploying an export.
 
-## Demo wallet
-Email identifies a browser-local demo wallet; no email is verified or sent. Daily grants are 10 simulated coins, each full match/restart costs 1, and a simulated reward adds 10 only at zero balance. No real ads, payments, backend ledger or anti-cheat protection are connected.
+## Server wallet
+The homepage uses the dedicated private NanoFun Google Sheet and Apps Script Web App. Guests receive five welcome coins, tracked by a random browser ID and a server ledger. Email sign-in uses a ten-minute one-time code and carries only unspent guest coins to a new verified account. Verified accounts can claim ten coins once per Los Angeles calendar day. No email address is accepted as authentication by itself.
+
+All three game cabinets await server authorization before starting or restarting. Each request has a durable operation UUID, so retries recover a pending round without charging twice. Opening a cabinet, pausing and resuming are free. Purchases, the annual subscription and rewarded ads remain disabled pending payment reconciliation and ad approval. See [backend setup](apps-script/README.md).
 
 ## Phone controls
 `mobile.js` provides independent multi-pointer buttons outside the court. Portrait places controls below the court; short landscape places them beside it. Single player shows P1; local two-player shows P1 and P2. Move, jump and smash can be held/tapped together. Rotation or hiding the page pauses play; the large pause/resume button resumes it. The Touch Controls toggle can also expose these controls on desktop.
@@ -18,18 +20,14 @@ Email identifies a browser-local demo wallet; no email is verified or sent. Dail
 The web game polls the host touch bridge for movement and one-shot actions. Existing WASD/R and arrow/Enter keyboard controls remain available. The earlier `.openai/hosting.json` is not the GitHub Pages deployment configuration.
 
 ## 2048 and Snake
-Three playable cabinets share the simulated wallet. New games keep independent sources in the games repository; only index.html, style.css, engine.js and app.js are deployed under docs/games. Each explicit start costs one coin; pause and continue are free. Leaving the cabinet ends the run. Both games support keyboard and mobile gestures; Snake also has direction buttons. Scores are browser-local.
+Three playable cabinets share the server wallet. New games keep independent sources in the games repository; only index.html, style.css, engine.js and app.js are deployed under docs/games. Each explicit start costs one coin; pause and continue are free. Leaving the cabinet ends the run. Both games support keyboard and mobile gestures; Snake also has direction buttons. Scores are browser-local.
 
 
-Welcome grant: localStorage grants five coins once per browser profile. Refreshing, reopening and new tabs preserve the count. Existing sessionStorage balances migrate without a refill. Storage failure does not allow an unrecorded guest spend. Guest coins are spent before the existing email balance. Cabinet entry is free even at zero; the next actual start opens the wallet when both balances are empty. Existing daily and simulated-ad rewards remain available after email entry.
-
+Guest access survives refresh while browser data is retained. Clearing storage or using another profile can create a new guest; this is not strong anti-abuse protection. Server quotas and verified email are the current limits. Existing browser-local demo balances are not paid funds and are not imported as server credit.
 
 ## Languages
 Auto-detects ordered browser languages and supports zh-CN, en, ja, es-MX and ko. Manual preference is browser-local and persists. No geolocation or external translation service is used. Translation source: dist/locales.tsv. Run node build-i18n.cjs to regenerate dist/i18n.js and docs/i18n.js. DOM text and accessibility labels are localized, including same-origin game frames; Godot's canvas HUD now polls the same selected language without restarting the match. New dynamic phrases must be added to the catalog.
 
 
 ## Rewarded-ad integration (not enabled)
-
-`dist/rewarded-ads.js` / `docs/rewarded-ads.js` implements the Google H5 `adBreak` reward callback lifecycle. It is not referenced by the current homepage and defaults to disabled. There is no publisher ID, ad request or real reward on the live demo. An approved H5 Games Ads account and provider loader/placement integration are still required. Only `adViewed` requests +3 coins; closing an ad, no fill, or a `viewed` status string alone never grants a reward. Reward failure is recorded as pending. The adapter deduplicates callbacks within one request; durable grant/round/Stripe idempotency and verified membership require a server implementation, not a frontend boolean.
-
-Before enabling production ads: replace the simulated daily/reward flow, integrate explicit reward consent and audio pause/resume, add privacy/consent requirements for the actual audience, and verify real provider completion plus a persisted reward without replay. The existing demo email is not authentication and cannot restore paid access.
+The optional `rewarded-ads.js` adapter covers the Google H5 callback lifecycle and is not loaded by the homepage. Fake timer rewards have been removed. AdSense and AdMob applications are under review; H5 Games Ads approval and durable server reward integration are still required. Target reward: +3 coins, up to eight daily, only after explicit consent and a completed rewarded ad. No advertising revenue is claimed.

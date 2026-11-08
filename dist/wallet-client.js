@@ -7,17 +7,26 @@
     let wallet=null;
     async function call(action,data={}){
       const token=storage.getItem('nanofun.wallet.auth.v1');
-      const response=await fetcher(endpoint,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...data,token})});
+      const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),30000);
+      let response;try{response=await fetcher(endpoint,{signal:controller.signal,method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...data,token})});}finally{clearTimeout(timer);}
       if(!response.ok)throw Error('wallet_unavailable');
       const result=await response.json();if(!result.ok)throw Error(result.error||'wallet_unavailable');
       if(result.wallet)wallet=result.wallet;else if(action==='wallet')wallet=result;
       return result;
     }
     return Object.freeze({
+      get snapshot(){return wallet;},
+      async guest(){
+        let device=storage.getItem('nanofun.wallet.device.v1');
+        if(!device){device=root.crypto.randomUUID();storage.setItem('nanofun.wallet.device.v1',device);}
+        const r=await call('guest',{device_id:device});
+        if(!r.token)throw Error('login_failed');storage.setItem('nanofun.wallet.auth.v1',r.token);return r.wallet;
+      },
       requestLogin:email=>call('request_login',{email}),
       async login(email,code){const r=await call('login',{email,code});if(!r.token)throw Error('login_failed');storage.setItem('nanofun.wallet.auth.v1',r.token);return r.wallet;},
       refresh:()=>call('wallet'),
       start:operationId=>call('start',{operation_id:operationId}),
+      daily:()=>call('daily'),
       // A return session ID requests server verification. URL flags never grant coins.
       verifyCheckout:sessionId=>call('verify_checkout',{session_id:sessionId}),
       checkoutUrl(plan){

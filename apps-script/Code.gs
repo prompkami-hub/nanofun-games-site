@@ -21,17 +21,19 @@ function setup() {
   });
 }
 function nfJson(value){return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);}
-function doGet(){return nfJson({service:'nanofun-wallet',schema:1,paid_enabled:false,ads_enabled:false});}
+function doGet(){return nfJson({service:'nanofun-wallet',schema:2,version:'guest-rounds-2',paid_enabled:false,ads_enabled:false});}
 function doPost(e){
   try {
     const raw=e&&e.postData&&e.postData.contents;
     if(!raw||raw.length>8192)throw Error('invalid_request');
     const p=JSON.parse(raw);
     if(p.action==='request_login')return nfJson(nfRequestLogin(p.email));
-    if(p.action==='login')return nfJson(nfLogin(p.email,p.code));
+    if(p.action==='guest')return nfJson(nfGuest(p.device_id));
+    if(p.action==='login')return nfJson(nfLogin(p.email,p.code,p.token));
     const id=nfAuthenticate(p.token);
     if(p.action==='wallet')return nfJson(nfLocked(()=>nfWallet(id)));
     if(p.action==='start')return nfJson(nfLocked(()=>nfStart(id,p.operation_id)));
+    if(p.action==='daily')return nfJson(nfLocked(()=>nfDaily(id)));
     if(p.action==='verify_checkout')return nfJson(nfVerifyCheckout(id,p.session_id));
     throw Error('unknown_action');
   }catch(err){return nfJson({ok:false,error:/^[a-z_]+$/.test(err.message)?err.message:'request_failed'});}
@@ -67,17 +69,46 @@ function nfRequestLogin(value){
     return {ok:true,status:'code_sent'};
   });
 }
-function nfLogin(value,code){
+function nfGuest(device){
+  if(!/^[0-9a-f-]{36}$/.test(String(device||'')))throw Error('invalid_device');
+  return nfLocked(()=>{
+    const identity='guest:'+nfHash(device),rows=nfRows('Players');
+    let row=rows.find(r=>r[1]===identity);
+    if(row&&row[2]!=='active')throw Error('login_required');
+    if(!row){
+      const props=PropertiesService.getScriptProperties(),day=Utilities.formatDate(new Date(),'America/Los_Angeles','yyyyMMdd'),key='guest_budget:'+day;
+      const count=Number(props.getProperty(key)||0);
+      if(count>=500)throw Error('try_later');
+      props.setProperty(key,String(count+1));
+      row=['nf_'+Utilities.getUuid(),identity,'active',0,'','','',new Date().toISOString()];nfSheet('Players').appendRow(row);
+    }
+    nfAppend('guest_welcome:'+nfHash(device),row[0],'welcome',5,'','');
+    return {ok:true,token:nfToken(row[0]),wallet:nfWallet(row[0])};
+  });
+}
+function nfLogin(value,code,previousToken){
   const email=nfEmail(value),cache=CacheService.getScriptCache(),key='otp:'+nfHash(email);
   return nfLocked(()=>{
     const raw=cache.get(key);if(!raw)throw Error('code_expired');const entry=JSON.parse(raw);
     if(entry.attempts>=5||entry.expires<Date.now()){cache.remove(key);throw Error('code_expired');}
     if(!/^\d{6}$/.test(String(code))||nfHash(String(code))!==entry.hash){entry.attempts++;cache.put(key,JSON.stringify(entry),600);throw Error('invalid_code');}
     cache.remove(key);
+    let guest=null;
+    if(previousToken){
+      try{const oldId=nfAuthenticate(previousToken);guest=nfRows('Players').find(r=>r[0]===oldId&&r[2]==='active'&&String(r[1]).startsWith('guest:'));}catch(err){/* Expired sessions cannot transfer a guest grant. */}
+    }
     let row=nfRows('Players').find(r=>r[1]===email);
     if(!row){row=['nf_'+Utilities.getUuid(),email,'active',0,'','','',new Date().toISOString()];nfSheet('Players').appendRow(row);}
     // The ledger is authoritative; a retry repairs the cached Players columns.
-    nfAppend('welcome:'+nfHash(email),row[0],'welcome',5,'','');
+    const remaining=guest?nfWallet(guest[0]).coins:5;
+    // A verified email receives one welcome grant, carrying only an existing
+    // guest's unspent welcome coins; repeated guest logins never refill it.
+    nfAppend('welcome:'+nfHash(email),row[0],'welcome',remaining,'','');
+    if(guest){
+      nfAppend('merge_out:'+guest[0],guest[0],'guest_merge',-remaining,'','');
+      const index=nfRows('Players').findIndex(r=>r[0]===guest[0]);
+      nfSheet('Players').getRange(index+2,3).setValue('merged');
+    }
     return {ok:true,token:nfToken(row[0]),wallet:nfWallet(row[0])};
   });
 }
@@ -97,8 +128,19 @@ function nfWallet(id){
   nfSheet('Players').getRange(index+2,4,1,2).setValues([[coins,until?new Date(until).toISOString():'']]);
   nfSheet('Players').getRange(index+2,8).setValue(new Date().toISOString());
   const properties=PropertiesService.getScriptProperties();
-  const coinReady=properties.getProperty('COIN_CHECKOUT_ENABLED')==='true'&&!!properties.getProperty('STRIPE_READ_KEY');
-  return {ok:true,player_id:id,coins,vip_expires_at:until||null,is_vip:until>Date.now(),paid_enabled:coinReady,checkout_ready:{coins_50:coinReady,vip_year:false},ads_enabled:false};
+  const guest=String(players[index][1]).startsWith('guest:');
+  const coinReady=!guest&&properties.getProperty('COIN_CHECKOUT_ENABLED')==='true'&&!!properties.getProperty('STRIPE_READ_KEY');
+  const email=String(players[index][1]),parts=email.split('@');
+  const day=Utilities.formatDate(new Date(),'America/Los_Angeles','yyyyMMdd');
+  return {ok:true,player_id:id,kind:guest?'guest':'email',email_label:guest?'Guest':parts[0].slice(0,2)+'***@'+parts[1],coins,vip_expires_at:until||null,is_vip:until>Date.now(),daily_available:!guest&&!entries.some(r=>r[0]==='daily:'+id+':'+day),paid_enabled:coinReady,checkout_ready:{coins_50:coinReady,vip_year:false},ads_enabled:false};
+}
+function nfDaily(id){
+  const row=nfRows('Players').find(r=>r[0]===id);
+  if(!row||String(row[1]).startsWith('guest:'))throw Error('verified_email_required');
+  nfWallet(id);
+  const day=Utilities.formatDate(new Date(),'America/Los_Angeles','yyyyMMdd');
+  nfAppend('daily:'+id+':'+day,id,'daily',10,'','');
+  return {ok:true,wallet:nfWallet(id)};
 }
 function nfStart(id,operation){
   if(!/^[0-9a-f-]{36}$/.test(String(operation||'')))throw Error('invalid_operation');

@@ -177,3 +177,66 @@ P2 摇杆：左右移动，向上跳跃	P2 joystick: move sideways, up to jump	P
 独立试玩 · 不计模拟币	Standalone preview · No coins used	単独体験 · コイン消費なし	Prueba independiente · Sin monedas	독립 체험 · 코인 사용 없음
 开始试玩	Start preview	体験を開始	Probar juego	체험 시작
 声音加载失败，请刷新重试	Audio failed to load. Refresh to retry.	音声の読み込みに失敗。再読み込みしてください。	No se cargó el sonido. Recarga para reintentar.	소리를 불러오지 못했어요. 새로고침하세요.
+能量	Coins	コイン	Monedas	코인
+免费试玩 · 钱包验证登录 · 付费补能与广告尚未开放	Free play · Verified wallet · Purchases and ads not yet available	無料プレイ・認証ウォレット・購入と広告は準備中	Juego gratis · Cuenta verificada · Compras y anuncios aún no disponibles	무료 플레이 · 인증 지갑 · 구매 및 광고 준비 중
+验证邮箱 · 每日领取能量	Verify email · Claim daily coins	メール認証で毎日コイン	Verifica tu correo · Recibe monedas diarias	이메일 인증 · 매일 코인 받기
+自愿补充能量	Optional extra coins	追加コインは任意	Monedas extra opcionales	선택형 추가 코인
+激励广告审核中 · 尚未开放	Rewarded ads under review · Not available yet	報酬広告は審査中・未提供	Anuncios con recompensa en revisión · Aún no disponibles	보상형 광고 심사 중 · 아직 이용 불가
+打开我的钱包 ↗	Open my wallet ↗	ウォレットを開く ↗	Abrir mi cartera ↗	내 지갑 열기 ↗
+1 能量 / 场	1 coin / match	1試合 / 1コイン	1 moneda / partida	경기당 코인 1개
+1 能量 / 局	1 coin / game	1プレイ / 1コイン	1 moneda / juego	한 판에 코인 1개
+先体验游戏，开心再回来。	Try a game. Come back for more fun.	まずは遊んで、また楽しもう。	Prueba un juego. Vuelve por más diversión.	게임을 즐기고 또 만나요.
+付费补能与真实广告尚未开放。	Purchases and real ads are not available yet.	コイン購入と広告はまだ利用できません。	Las compras y los anuncios reales aún no están disponibles.	코인 구매와 실제 광고는 아직 이용할 수 없습니다.
+玩法与账户说明	Play and account guide	遊び方とアカウント	Guía de juego y cuenta	게임 및 계정 안내
+能量补给站	Your coin wallet	コインウォレット	Tu cartera de monedas	코인 지갑
+正在连接你的钱包…	Connecting to your wallet…	ウォレットに接続中…	Conectando con tu cartera…	지갑 연결 중…
+连接钱包中…	Connecting…	接続中…	Conectando…	연결 중…
+发送登录验证码 →	Send sign-in code →	ログインコードを送信 →	Enviar código de acceso →	로그인 코드 보내기 →
+验证码将发送至你的邮箱，10 分钟内有效。	A code will be emailed to you. Valid for 10 minutes.	コードをメールで送信します。有効期限は10分です。	Recibirás un código por correo. Válido por 10 minutos.	이메일로 코드를 보냅니다. 10분간 유효합니다.
+邮箱验证码	Email verification code	メール認証コード	Código de verificación	이메일 인증 코드
+验证并恢复余额 →	Verify and restore balance →	認証して残高を復元 →	Verificar y recuperar saldo →	인증하고 잔액 복원 →
+退出登录	Sign out	ログアウト	Cerrar sesión	로그아웃
+领取今日 10 枚能量	Claim today's 10 coins	今日の10コインを受け取る	Recibir las 10 monedas de hoy	오늘의 코인 10개 받기
+50 枚能量	50 coins	50コイン	50 monedas	코인 50개
+$0.99 USD · 一次性	$0.99 USD · One-time payment	$0.99 USD・1回払い	$0.99 USD · Pago único	$0.99 USD · 일회성 결제
+付费补能尚未开放	Coin purchases not yet available	コイン購入は準備中	Compra de monedas aún no disponible	코인 구매 준비 중
+年度通行证	Annual pass	年間パス	Pase anual	연간 패스
+$9.99 USD / 年 · 每年自动续费，直至取消	$9.99 USD / year · Renews annually until cancelled	$9.99 USD / 年・解約まで毎年自動更新	$9.99 USD / año · Renovación anual hasta cancelar	연 $9.99 USD · 취소할 때까지 매년 자동 갱신
+开放后可免能量畅玩，并隐藏续玩广告。	When available: play without spending coins or continuation ads.	提供開始後はコイン消費と継続広告なしでプレイ。	Al activarse: juega sin gastar monedas ni anuncios para continuar.	출시 후 코인 차감과 이어하기 광고 없이 플레이.
+年度通行证尚未开放	Annual pass not yet available	年間パスは準備中	Pase anual aún no disponible	연간 패스 준비 중
+自愿观看广告	Optional rewarded ads	任意の報酬広告	Anuncios con recompensa opcionales	선택형 보상 광고
+开放后完成奖励 +3 枚 · 每天最多 8 次	When available: +3 coins on completion · Up to 8 daily	提供開始後は完了で+3コイン・1日8回まで	Al activarse: +3 monedas al completar · Hasta 8 al día	출시 후 완료 시 +3코인 · 하루 최대 8회
+激励广告审核中	Rewarded ads under review	報酬広告は審査中	Anuncios con recompensa en revisión	보상형 광고 심사 중
+广告仍在审核，暂不播放或发放广告奖励。	Ads are under review. No ads or ad rewards are active.	広告は審査中です。配信・報酬付与は行いません。	Los anuncios están en revisión. No hay anuncios ni recompensas activos.	광고 심사 중입니다. 광고와 광고 보상은 비활성 상태입니다.
+账户余额已同步，换设备登录也能恢复。	Balance synced. Sign in on another device to restore it.	残高を同期済み。別の端末でもログインで復元できます。	Saldo sincronizado. Inicia sesión en otro dispositivo para recuperarlo.	잔액 동기화 완료. 다른 기기에서도 로그인하여 복원하세요.
+游客体验：首次 5 枚能量，开局扣 1 枚；登录后恢复账户并领取每日能量。	Guest welcome: 5 coins, 1 per game. Verify email to restore your account and claim daily coins.	ゲストは初回5コイン、1プレイ1コイン。メール認証でアカウント復元と毎日コイン。	Invitado: 5 monedas, 1 por juego. Verifica tu correo para recuperar tu cuenta y recibir monedas diarias.	게스트 첫 코인 5개, 한 판에 1개. 이메일 인증 후 계정 복원 및 매일 코인을 받으세요.
+填写邮箱，恢复你的账户余额。	Enter your email to restore your balance.	メールアドレスで残高を復元。	Ingresa tu correo para recuperar tu saldo.	이메일을 입력하여 잔액을 복원하세요.
+已验证邮箱 · 账户余额由服务器记录	Email verified · Balance securely recorded	メール認証済み・残高はサーバーに記録	Correo verificado · Saldo registrado en el servidor	이메일 인증 완료 · 서버에 잔액 기록
+游客钱包 · 验证邮箱后可跨设备恢复	Guest wallet · Verify email for recovery across devices	ゲストウォレット・メール認証で別端末から復元可能	Cartera de invitado · Verifica tu correo para recuperar en otros dispositivos	게스트 지갑 · 이메일 인증 후 다른 기기에서 복원 가능
+验证码已发送，10 分钟内有效。	Code sent. Valid for 10 minutes.	コードを送信しました。有効期限は10分です。	Código enviado. Válido por 10 minutos.	코드를 보냈습니다. 10분간 유효합니다.
+登录成功，账户余额已恢复。	Signed in. Balance restored.	ログイン成功。残高を復元しました。	Sesión iniciada. Saldo recuperado.	로그인 성공. 잔액이 복원되었습니다.
+今日能量已到账。	Today's coins are ready!	今日のコインを受け取りました！	¡Ya recibiste las monedas de hoy!	오늘의 코인을 받았습니다!
+已退出登录，填写邮箱恢复余额。	Signed out. Enter your email to restore your balance.	ログアウトしました。メールアドレスで残高を復元できます。	Sesión cerrada. Ingresa tu correo para recuperar tu saldo.	로그아웃했습니다. 이메일로 잔액을 복원하세요.
+点击游戏内开始按钮，确认 1 枚能量后开局。	Press Start in the game. One coin is confirmed before play.	ゲームの開始ボタンを押すと1コイン確認後にプレイ開始。	Pulsa Iniciar en el juego. Se confirma una moneda antes de jugar.	게임에서 시작을 누르면 코인 1개 확인 후 시작합니다.
+正在确认能量，请稍候…	Confirming your coin. One moment…	コインを確認中。お待ちください…	Confirmando tu moneda. Un momento…	코인 확인 중. 잠시 기다려 주세요…
+已确认 1 枚能量，祝你玩得开心！	One coin confirmed. Have fun!	1コインを確認。楽しんでね！	¡Una moneda confirmada. Diviértete!	코인 1개 확인 완료. 즐겁게 플레이하세요!
+VIP 畅玩，本局不扣能量。	VIP play. No coin charged.	VIPプレイ。コイン消費なし。	Juego VIP. Sin cargo de monedas.	VIP 플레이. 코인이 차감되지 않습니다.
+查看能量 ＋	View coins ＋	コインを確認 ＋	Ver monedas ＋	코인 보기 ＋
+请用邮箱登录，恢复你的账户。	Sign in with email to restore your account.	メールでログインしてアカウントを復元。	Inicia sesión con tu correo para recuperar tu cuenta.	이메일로 로그인하여 계정을 복원하세요.
+验证码不正确，请重新输入。	Incorrect code. Please try again.	コードが違います。もう一度入力してください。	Código incorrecto. Inténtalo de nuevo.	코드가 올바르지 않습니다. 다시 입력하세요.
+验证码已过期，请重新发送。	Code expired. Request a new one.	コードの期限が切れました。再送してください。	Código vencido. Solicita otro.	코드가 만료되었습니다. 다시 요청하세요.
+请求较多，请稍后再试。	Too many requests. Please try later.	リクエストが多すぎます。後でお試しください。	Demasiadas solicitudes. Intenta más tarde.	요청이 많습니다. 나중에 다시 시도하세요.
+能量已用完，登录后领取每日能量。	Out of coins. Sign in to claim daily coins.	コインがありません。ログインして毎日のコインを受け取ろう。	Sin monedas. Inicia sesión para recibir tus monedas diarias.	코인이 없습니다. 로그인 후 매일 코인을 받으세요.
+请先验证邮箱。	Please verify your email first.	まずメールを認証してください。	Primero verifica tu correo.	이메일을 먼저 인증하세요.
+请先恢复钱包连接或验证邮箱。	Reconnect your wallet or verify your email first.	ウォレットに再接続するかメールを認証してください。	Reconecta tu cartera o verifica tu correo primero.	지갑을 다시 연결하거나 이메일을 인증하세요.
+连接暂时失败。请重试；开局请求会核对原编号，不会重复扣币。	Connection failed. Retry safely: the same request will not charge twice.	接続できません。再試行しても同じリクエストで二重課金されません。	Falló la conexión. Reintenta: la misma solicitud no cobra dos veces.	연결 실패. 다시 시도해도 같은 요청은 이중 차감되지 않습니다.
+上次开局仍待确认，请先返回上一款游戏重试。	A previous start is pending. Return to that game and retry first.	前回の開始を確認中です。そのゲームで再試行してください。	Hay un inicio pendiente. Vuelve a ese juego y reintenta primero.	이전 시작이 확인 대기 중입니다. 해당 게임에서 먼저 재시도하세요.
+上一账户有待确认的开局，请先恢复该账户。	A previous account has a pending start. Restore that account first.	前のアカウントに未確認の開始があります。先に復元してください。	La cuenta anterior tiene un inicio pendiente. Recupérala primero.	이전 계정의 시작 요청이 대기 중입니다. 먼저 해당 계정을 복원하세요.
+邮箱、能量余额与使用记录保存在 NanoFun 私有账户表中。Google 提供验证码与数据服务；不会在公开网页展示其他玩家资料。	Your email, balance and usage are stored privately by NanoFun. Google provides email codes and data services. Other players' details are never shown here.	メール、残高、利用履歴はNanoFunの非公開アカウント表に保存します。Googleが認証メールとデータサービスを提供し、他の利用者情報は公開しません。	NanoFun guarda en privado tu correo, saldo y uso. Google proporciona los códigos y el servicio de datos. No se muestran datos de otros jugadores.	이메일, 잔액, 이용 기록은 NanoFun 비공개 계정 표에 저장됩니다. Google이 인증 및 데이터 서비스를 제공하며 다른 이용자 정보는 공개하지 않습니다.
+一枚能量，一整场。	One coin. One complete game.	1コインで、1ゲーム。	Una moneda. Un juego completo.	코인 하나로 한 경기.
+首次游客体验 5 枚能量。进入机台免费，点击开始或重开时，由服务器确认扣 1 枚。	Guests start with 5 coins. Opening a game is free; Start or Restart spends 1 coin after server confirmation.	ゲストは初回5コイン。画面を開くのは無料。開始・再開時にサーバー確認後1コイン消費します。	Recibes 5 monedas como invitado. Abrir es gratis; Iniciar o Reiniciar gasta una moneda tras confirmación.	게스트 첫 코인 5개. 게임 열기는 무료이며 시작 또는 재시작 시 서버 확인 후 1개 차감됩니다.
+暂停、继续不扣能量；2048 达标后可免费继续。本局排球可玩到 15 分。	Pause and Resume are free. Continue past 2048 at no extra cost. Volleyball lasts to 15 points.	一時停止・続行は無料。2048達成後も追加消費なし。バレーは15点先取。	Pausar y continuar es gratis. Sigue tras 2048 sin costo extra. Voleibol termina a los 15 puntos.	일시 정지와 계속하기는 무료입니다. 2048 달성 후 무료로 계속하며 배구는 15점까지입니다.
+验证邮箱后可恢复账户余额，每天按洛杉矶日期领取 10 枚能量。游客已用的首次能量不会在登录时重复赠送。	Verify email to restore your balance and claim 10 coins per Los Angeles calendar day. Spent welcome coins are not granted again at sign-in.	メール認証で残高復元とロサンゼルス日付ごとに10コイン。使用済みの初回コインはログイン時に再付与されません。	Verifica tu correo para recuperar saldo y recibir 10 monedas por día de Los Ángeles. Las monedas iniciales gastadas no se regalan de nuevo al iniciar sesión.	이메일 인증 후 잔액 복원 및 로스앤젤레스 날짜 기준 매일 10개 수령. 사용한 첫 코인은 로그인해도 다시 지급되지 않습니다.
+付费补能、年度通行证和真实激励广告尚未开放。开放时间将在本页公布。	Coin purchases, annual passes and rewarded ads are not available yet. Availability will be announced here.	コイン購入、年間パス、報酬広告は準備中です。開始時期はこのページでお知らせします。	Las compras, el pase anual y los anuncios con recompensa aún no están disponibles. Su activación se anunciará aquí.	코인 구매, 연간 패스, 보상 광고는 준비 중입니다. 출시 일정은 이 페이지에서 안내합니다.
+NanoFun 使用 Google Apps Script 与私有 Google Sheet 保存邮箱、余额和开局记录。验证码有效 10 分钟；登录会话保存在本机浏览器，退出可移除本机会话。游客记录依赖本机随机标识，清理浏览器数据可能丢失；邮箱账户可重新登录恢复。	NanoFun stores email, balances and game starts in a private Google Sheet using Apps Script. Codes expire after 10 minutes. Signing out removes this browser's session. Clearing browser data may lose guest access; email accounts can sign in again to recover.	NanoFunはApps Scriptと非公開Google Sheetでメール・残高・開始履歴を保存します。コードは10分間有効。ログアウトで端末のセッションを削除します。ブラウザデータ削除でゲスト情報にアクセスできなくなる場合があります。メールアカウントは再ログインで復元できます。	NanoFun guarda correo, saldo e inicios en una hoja privada de Google con Apps Script. Los códigos duran 10 minutos. Cerrar sesión elimina la sesión local. Borrar datos del navegador puede perder el acceso de invitado; las cuentas de correo pueden recuperarse al iniciar sesión.	NanoFun은 Apps Script와 비공개 Google Sheet에 이메일, 잔액, 시작 기록을 저장합니다. 코드는 10분 유효하며 로그아웃하면 기기 세션이 삭제됩니다. 브라우저 데이터 삭제 시 게스트 접근을 잃을 수 있으나 이메일 계정은 다시 로그인하여 복원할 수 있습니다.
+游戏为非官方二创，保留原素材署名。当前能量没有现金价值，不提供提现。	Games are unofficial adaptations with original credits retained. Coins have no cash value and cannot be withdrawn.	ゲームは非公式の二次創作で原素材の表記を保持します。コインに現金価値はなく換金できません。	Juegos no oficiales que conservan los créditos originales. Las monedas no tienen valor en efectivo ni pueden retirarse.	게임은 원본 크레딧을 보존하는 비공식 2차 창작입니다. 코인은 현금 가치가 없으며 출금할 수 없습니다.

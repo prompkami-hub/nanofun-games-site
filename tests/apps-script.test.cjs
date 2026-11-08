@@ -27,3 +27,22 @@ test('Round retries are idempotent and a sixth paid start is blocked at zero',()
  assert.throws(()=>sandbox.nfStart('buyer','00000000-0000-4000-8000-000000000009'),/insufficient_coins/);
  assert.equal(ledger.length,6);
 });
+
+function accountBackend(){
+ const tables={Players:[],Ledger:[]},properties=new Map(),cache=new Map();let sequence=0,day='20261107';
+ const box={PropertiesService:{getScriptProperties:()=>({getProperty:k=>properties.get(k)||null,setProperty:(k,v)=>properties.set(k,v)})},Utilities:{getUuid:()=>`00000000-0000-4000-8000-${String(++sequence).padStart(12,'0')}`,formatDate:()=>day},CacheService:{getScriptCache:()=>({get:k=>cache.get(k)||null,put:(k,v)=>cache.set(k,v),remove:k=>cache.delete(k)})}};
+ vm.runInNewContext(fs.readFileSync('apps-script/Code.gs','utf8'),box);
+ box.nfLocked=fn=>fn();box.nfHash=s=>require('node:crypto').createHash('sha256').update(s).digest('hex');box.nfToken=id=>'signed:'+id;box.nfAuthenticate=t=>{if(!t?.startsWith('signed:'))throw Error('login_required');return t.slice(7);};
+ box.nfRows=name=>tables[name];box.nfSheet=name=>({appendRow:r=>tables[name].push(r),getRange:(row,column)=>({setValue:v=>tables[name][row-2][column-1]=v,setValues:values=>values[0].forEach((v,i)=>tables[name][row-2][column-1+i]=v)})});
+ return {s:box,tables,nextDay:()=>day='20261108',login(email,token){cache.set('otp:'+box.nfHash(email),JSON.stringify({hash:box.nfHash('123456'),attempts:0,expires:Date.now()+10000}));return box.nfLogin(email,'123456',token);}};
+}
+test('Guest refresh does not refill, and email upgrade carries unspent coins only once',()=>{
+ const b=accountBackend(),id='00000000-0000-4000-8000-000000000099',g=b.s.nfGuest(id);
+ b.s.nfStart(g.wallet.player_id,'00000000-0000-4000-8000-000000000001');b.s.nfStart(g.wallet.player_id,'00000000-0000-4000-8000-000000000002');assert.equal(b.s.nfGuest(id).wallet.coins,3);
+ const a=b.login('buyer@example.com',g.token);assert.equal(a.wallet.coins,3);assert.equal(a.wallet.kind,'email');assert.throws(()=>b.s.nfGuest(id),/login_required/);
+ const another=b.s.nfGuest('00000000-0000-4000-8000-000000000088');assert.equal(b.login('buyer@example.com',another.token).wallet.coins,3,'fresh guests cannot refill an existing email');assert.equal(b.tables.Ledger.filter(r=>r[0].startsWith('welcome:')).length,1);
+});
+test('Daily energy needs verified email, grants once per LA day, and never enables checkout',()=>{
+ const b=accountBackend(),g=b.s.nfGuest('00000000-0000-4000-8000-000000000099');assert.throws(()=>b.s.nfDaily(g.wallet.player_id),/verified_email_required/);
+ const a=b.login('buyer@example.com',g.token);assert.equal(b.s.nfDaily(a.wallet.player_id).wallet.coins,15);assert.equal(b.s.nfDaily(a.wallet.player_id).wallet.coins,15);b.nextDay();assert.equal(b.s.nfDaily(a.wallet.player_id).wallet.coins,25);assert.equal(b.s.nfWallet(a.wallet.player_id).checkout_ready.coins_50,false);
+});

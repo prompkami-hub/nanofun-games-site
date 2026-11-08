@@ -1,5 +1,9 @@
 {
   "repository": "prompkami-hub/nanofun-games-site",
   "migration": "nanofun-2026-11-05",
-  "content_base_commit": "efef3799445e743068f54cc75b3ae47e72e7b4df"
+  "content_base_commit": "efef3799445e743068f54cc75b3ae47e72e7b4df",
+  "release": "server-wallet-v2",
+  "released_at": "2026-11-08T03:16:45.522109+00:00",
+  "wallet_api_version": "guest-rounds-2",
+  "game_pack": "wallet-v1.pck"
 }
