@@ -27,3 +27,9 @@ Welcome grant: localStorage grants five coins once per browser profile. Refreshi
 ## Languages
 Auto-detects ordered browser languages and supports zh-CN, en, ja, es-MX and ko. Manual preference is browser-local and persists. No geolocation or external translation service is used. Translation source: dist/locales.tsv. Run node build-i18n.cjs to regenerate dist/i18n.js and docs/i18n.js. DOM text and accessibility labels are localized, including same-origin game frames; Godot's canvas HUD now polls the same selected language without restarting the match. New dynamic phrases must be added to the catalog.
 
+
+## Rewarded-ad integration (not enabled)
+
+`dist/rewarded-ads.js` / `docs/rewarded-ads.js` implements the Google H5 `adBreak` reward callback lifecycle. It is not referenced by the current homepage and defaults to disabled. There is no publisher ID, ad request or real reward on the live demo. An approved H5 Games Ads account and provider loader/placement integration are still required. Only `adViewed` requests +3 coins; closing an ad, no fill, or a `viewed` status string alone never grants a reward. Reward failure is recorded as pending. The adapter deduplicates callbacks within one request; durable grant/round/Stripe idempotency and verified membership require a server implementation, not a frontend boolean.
+
+Before enabling production ads: replace the simulated daily/reward flow, integrate explicit reward consent and audio pause/resume, add privacy/consent requirements for the actual audience, and verify real provider completion plus a persisted reward without replay. The existing demo email is not authentication and cannot restore paid access.
