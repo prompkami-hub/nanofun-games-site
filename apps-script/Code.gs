@@ -21,7 +21,7 @@ function setup() {
   });
 }
 function nfJson(value){return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);}
-function doGet(){return nfJson({service:'nanofun-wallet',schema:3,version:'billing-acceptance-3',paid_enabled:PropertiesService.getScriptProperties().getProperty('BILLING_ENABLED')==='true'&&!PropertiesService.getScriptProperties().getProperty('BILLING_TEST_EMAIL'),ads_enabled:false});}
+function doGet(){return nfJson({service:'nanofun-wallet',schema:4,version:'receipt-outbox-4',paid_enabled:PropertiesService.getScriptProperties().getProperty('BILLING_ENABLED')==='true'&&!PropertiesService.getScriptProperties().getProperty('BILLING_TEST_EMAIL'),ads_enabled:false});}
 function doPost(e){
   try {
     const raw=e&&e.postData&&e.postData.contents;
@@ -225,13 +225,15 @@ function nfFulfillSession(sessionId,expectedPlayer){
   const boughtPrice=session.line_items.data[0].price.id;
   if(plan==='coins_50'){
     const {charge,disputes}=nfGetCharge(nfObjectId(session.payment_intent),99),target=nfCoinTarget(charge,disputes);
-    return nfLocked(()=>{
+    const result=nfLocked(()=>{
       nfAppend('stripe:'+session.id,id,'coins_50',50,'',session.id);
       const entries=nfRows('Ledger').filter(r=>r[1]===id&&r[5]===session.id&&(r[2]==='coins_50'||r[2]==='coin_adjustment'));
       const prior=entries.reduce((sum,r)=>sum+Number(r[3]),0);
       if(prior!==target)nfAppend('stripe_adjust:'+session.id+':'+entries.length+':'+target,id,'coin_adjustment',target-prior,'',session.id);
       return {ok:true,plan,wallet:nfWallet(id)};
     });
+    result.receipt_status=nfTryQueueReceipt({key:'checkout:'+session.id,playerId:id,email:row[1],orderId:session.id,kind:'coins_50',amountCents:99,paidAt:charge.created,coinsCredited:target,receiptUrl:charge.receipt_url||''});
+    return result;
   }
   const subscription=nfLive(nfStripe('subscriptions/'+nfObjectId(session.subscription)));
   if(nfObjectId(subscription.customer)!==nfObjectId(session.customer))throw Error('order_owner_mismatch');
@@ -242,7 +244,7 @@ function nfFulfillSession(sessionId,expectedPlayer){
   if(!intentId){if(invoice.payments?.has_more)throw Error('billing_coverage_incomplete');const payments=(invoice.payments?.data||[]).filter(p=>p.status==='paid');if(payments.length!==1)throw Error('payment_not_verified');intentId=nfObjectId(payments[0].payment?.payment_intent);}
   const {charge,disputes}=nfGetCharge(intentId,999);until=nfVipUntil(subscription,invoice,charge,disputes,boughtPrice);
   }else{nfVipUntil(subscription,invoice,null,{data:[],has_more:false},boughtPrice);}
-  return nfLocked(()=>{
+  const result=nfLocked(()=>{
     const index=nfRows('Players').findIndex(r=>r[0]===id),old=nfRows('Players')[index];
     if(old[6]&&old[6]!==subscription.id)throw Error('multiple_subscriptions_need_review');
     nfSheet('Players').getRange(index+2,6,1,2).setValues([[nfObjectId(session.customer),subscription.id]]);
@@ -251,6 +253,8 @@ function nfFulfillSession(sessionId,expectedPlayer){
     if(last!==until)nfAppend('vip_state:'+subscription.id+':'+states.length+':'+until,id,'vip_state',0,new Date(until).toISOString(),session.id);
     return {ok:true,plan,wallet:nfWallet(id)};
   });
+  if(until>Date.now())result.receipt_status=nfTryQueueReceipt({key:'invoice:'+invoice.id,playerId:id,email:row[1],orderId:session.id,kind:invoice.billing_reason==='subscription_cycle'?'vip_renewal':'vip_initial',amountCents:999,paidAt:invoice.status_transitions?.paid_at,vipUntil:until,receiptUrl:invoice.hosted_invoice_url||''});
+  return result;
 }
 function nfSyncKnownBilling(id){
   const props=PropertiesService.getScriptProperties();if(props.getProperty('BILLING_ENABLED')!=='true')return;
@@ -291,6 +295,7 @@ function reconcileNanoFunBilling(){
     });
     if(list.has_more){if(!list.data.length)throw Error('billing_coverage_incomplete');props.setProperty('billing_cursor:'+link,list.data[list.data.length-1].id);}else{props.deleteProperty('billing_cursor:'+link);summary.completed_links++;}
   });
+  summary.receipts=processNanoFunReceiptOutbox();
   props.setProperty('billing_last_summary',JSON.stringify({...summary,at:new Date().toISOString()}));console.log(JSON.stringify(summary));return summary;
 }
 function installNanoFunBilling(){
@@ -312,3 +317,84 @@ function confirmNanoFunBillingTrigger(){
   PropertiesService.getScriptProperties().setProperty('BILLING_TRIGGER_CONFIRMED','true');
   console.log('Reconciliation trigger confirmation recorded; checkout not enabled by this function.');
 }
+
+// Transactional receipts. No customer records or message bodies are logged.
+const NF_RECEIPT_HEADERS=['ReceiptId','PlayerId','OrderId','Kind','State','ToEmail','PayloadJson','Attempts','UpdatedAt','LastError'];
+function setupNanoFunReceipts(){
+  const book=SpreadsheetApp.openById(NF_SHEET_ID);let sheet=book.getSheetByName('Receipts');
+  if(!sheet){sheet=book.insertSheet('Receipts');sheet.getRange(1,1,1,NF_RECEIPT_HEADERS.length).setValues([NF_RECEIPT_HEADERS]);sheet.setFrozenRows(1);}
+  if(JSON.stringify(sheet.getRange(1,1,1,NF_RECEIPT_HEADERS.length).getValues()[0])!==JSON.stringify(NF_RECEIPT_HEADERS))throw Error('receipt_schema_mismatch');
+  const props=PropertiesService.getScriptProperties();if(!props.getProperty('RECEIPT_EMAIL_SINCE'))props.setProperty('RECEIPT_EMAIL_SINCE',String(Math.floor(Date.now()/1000)));
+  props.setProperty('RECEIPT_OUTBOX_READY','true');
+  // Sending remains off during sandbox acceptance. No historical backfill.
+  console.log('Private receipt outbox ready. Automatic sending stays disabled until acceptance.');
+}
+function nfReceiptRows(){const s=nfSheet('Receipts');return s.getLastRow()<2?[]:s.getRange(2,1,s.getLastRow()-1,NF_RECEIPT_HEADERS.length).getValues();}
+function nfReceiptWrite(index,row){
+  const rows=nfReceiptRows(),actual=rows.findIndex(r=>r[0]===row[0]);
+  if(actual<0||rows[actual][1]!==row[1])throw Error('receipt_owner_mismatch');
+  nfSheet('Receipts').getRange(actual+2,1,1,NF_RECEIPT_HEADERS.length).setValues([row]);
+}
+function nfEscapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function nfRenderReceipt(p){
+  if(!['coins_50','vip_initial','vip_renewal'].includes(p.kind)||!/^NF-\d{8}-[A-F0-9]{12}$/.test(p.reference||'')||!/^cs_(live|test)_[A-Za-z0-9]+$/.test(p.orderId||''))throw Error('invalid_receipt_payload');
+  const coin=p.kind==='coins_50',product=coin?'NanoFun 50 Coins Pack':'NanoFun Annual VIP Pass';
+  if(p.amountCents!==(coin?99:999)||p.currency!=='usd'||!Number.isSafeInteger(p.paidAt)||p.paidAt<=0)throw Error('invalid_receipt_payload');
+  if(coin&&(!Number.isSafeInteger(p.coinsCredited)||p.coinsCredited<0||p.coinsCredited>50))throw Error('invalid_receipt_payload');
+  if(!coin&&(!Number.isSafeInteger(p.vipUntil)||p.vipUntil<=p.paidAt*1000))throw Error('invalid_receipt_payload');
+  const amount=coin?'$0.99 USD':'$9.99 USD';
+  const intro=p.kind==='vip_renewal'?'Your annual renewal payment has been verified and your NanoFun access has been updated.':'Your payment has been verified and your NanoFun wallet has been updated.';
+  const entitlement=coin?(p.coinsCredited===50?'You purchased 50 coins. They have been credited to your wallet. Each new game or restart costs 1 coin; pausing and resuming are free.':'You purchased 50 coins. At order verification, after the recorded refund or dispute adjustment, this purchase provided '+p.coinsCredited+' coins. Your wallet shows the current available balance.'):'This paid annual VIP period was recorded through '+new Date(p.vipUntil).toISOString().replace('T',' ').replace('.000Z',' UTC')+'. Supported games do not spend coins while VIP is active. Check your wallet for current access after any later cancellation, refund or dispute.';
+  const terms=coin?'One-time purchase. No recurring charge for this coin pack. Coins have no cash value and cannot be withdrawn.':'$9.99 USD per year. The subscription renews annually until canceled. Canceling future renewal does not shorten an already-paid period. For cancellation help, contact superpowergames.us@gmail.com. Rewarded continuation ads, when available, are hidden during active VIP access.';
+  let receipt='';if(p.receiptUrl){if(!/^https:\/\/(?:pay|invoice)\.stripe\.com\/[A-Za-z0-9_/?=&%#.+:-]+$/.test(p.receiptUrl))throw Error('invalid_receipt_link');receipt='<p style="font-size:13px"><a href="'+nfEscapeHtml(p.receiptUrl)+'">View your Stripe payment document</a></p>';}
+  const subject='NanoFun '+(p.kind==='vip_renewal'?'renewal confirmation':'purchase confirmation')+' — '+product+' ['+p.reference+']';
+  const paidAt=new Date(p.paidAt*1000).toISOString().replace('T',' ').replace('.000Z',' UTC');
+  const replacements={SUBJECT:subject,INTRO:intro,PRODUCT:product,AMOUNT:amount,REFERENCE:p.reference,PAID_AT:paidAt,ENTITLEMENT:entitlement,BILLING_TERMS:terms,ORDER_ID:p.orderId};
+  const htmlBody=NF_RECEIPT_HTML.replace(/\{\{([A-Z_]+)\}\}/g,(_,key)=>key==='STRIPE_RECEIPT_LINK'?receipt:nfEscapeHtml(replacements[key]??''));
+  return {subject,htmlBody,body:[intro,'','Product: '+product,'Quantity: 1','Amount paid: '+amount,'Order reference: '+p.reference,'Payment date: '+paidAt,'Stripe order: '+p.orderId,'',entitlement,terms,'','Open NanoFun: https://nanofungames.com/','Sign in with the same purchase email. Open your wallet and choose Restore purchases if needed.',p.receiptUrl?'Stripe payment document: '+p.receiptUrl:'','Payment merchant: PromptKami. Product: NanoFun Games.','Support: superpowergames.us@gmail.com','This purchase confirmation is not a tax invoice or marketing subscription.'].filter(v=>v!==null).join('\n')};
+}
+function nfTryQueueReceipt(info){
+  const props=PropertiesService.getScriptProperties();if(props.getProperty('RECEIPT_OUTBOX_READY')!=='true')return 'not_configured';
+  const since=Number(props.getProperty('RECEIPT_EMAIL_SINCE'));if(!Number.isSafeInteger(info.paidAt)||!Number.isFinite(since)||since<=0)return 'needs_review';
+  if(info.paidAt<since)return 'historical_skipped';
+  try{return nfLocked(()=>{
+    const existing=nfReceiptRows().find(r=>r[0]===info.key);if(existing){if(existing[1]!==info.playerId||existing[2]!==info.orderId)throw Error('receipt_owner_mismatch');return existing[4];}
+    const row=nfRows('Players').find(r=>r[0]===info.playerId&&r[2]==='active'&&!String(r[1]).startsWith('guest:'));if(!row||nfEmail(info.email)!==row[1])throw Error('receipt_owner_mismatch');
+    const reference='NF-'+new Date(info.paidAt*1000).toISOString().slice(0,10).replace(/-/g,'')+'-'+nfHash(info.key).slice(0,12).toUpperCase();
+    const payload={kind:info.kind,orderId:info.orderId,reference,amountCents:info.amountCents,currency:'usd',paidAt:info.paidAt,coinsCredited:info.coinsCredited,vipUntil:info.vipUntil,receiptUrl:info.receiptUrl||''};
+    nfRenderReceipt(payload);nfSheet('Receipts').appendRow([info.key,info.playerId,info.orderId,info.kind,'queued',row[1],JSON.stringify(payload),0,new Date().toISOString(),'']);return 'queued';
+  });}catch(e){console.warn('Receipt queue needs review; wallet fulfillment is preserved.');return 'queue_needs_review';}
+}
+function processNanoFunReceiptOutbox(){
+  const props=PropertiesService.getScriptProperties();const summary={sent:0,pending:0,delivery_unknown:0};
+  if(props.getProperty('RECEIPT_OUTBOX_READY')!=='true'||props.getProperty('RECEIPT_EMAIL_ENABLED')!=='true')return {...summary,disabled:true};
+  for(let n=0;n<10;n++){
+    if(MailApp.getRemainingDailyQuota()<1){summary.pending++;break;}
+    const job=nfLocked(()=>{
+      const rows=nfReceiptRows();
+      rows.forEach((r,i)=>{if(r[4]==='sending'&&Date.now()-Date.parse(r[8])>600000){r[4]='delivery_unknown';r[9]='Interrupted send; reconcile Sent mailbox before retry';r[8]=new Date().toISOString();nfReceiptWrite(i,r);}});
+      const index=rows.findIndex(r=>r[4]==='queued');if(index<0)return null;
+      const row=rows[index];let message;
+      try{nfEmail(row[5]);message=nfRenderReceipt(JSON.parse(row[6]));}catch(e){row[4]='needs_review';row[9]='Invalid receipt payload';nfReceiptWrite(index,row);return {skip:true};}
+      row[4]='sending';row[7]=Number(row[7])+1;row[8]=new Date().toISOString();row[9]='';nfReceiptWrite(index,row);return {index,row,message};
+    });
+    if(!job)break;if(job.skip)continue;
+    // MailApp has no provider idempotency key. A crash/uncertain send is held
+    // for Sent-mail reconciliation, never automatically sent a second time.
+    try{
+      MailApp.sendEmail({to:job.row[5],subject:job.message.subject,body:job.message.body,htmlBody:job.message.htmlBody,name:'NanoFun Games',replyTo:'superpowergames.us@gmail.com'});
+      nfLocked(()=>{job.row[4]='sent';job.row[8]=new Date().toISOString();nfReceiptWrite(job.index,job.row);});summary.sent++;
+    }catch(e){
+      nfLocked(()=>{job.row[4]='delivery_unknown';job.row[9]='Reconcile Sent mailbox by order reference before retry';job.row[8]=new Date().toISOString();nfReceiptWrite(job.index,job.row);});summary.delivery_unknown++;
+    }
+  }
+  const remaining=nfReceiptRows();
+  summary.pending=remaining.filter(r=>r[4]==='queued').length;
+  summary.delivery_unknown=remaining.filter(r=>r[4]==='delivery_unknown').length;
+  summary.needs_review=remaining.filter(r=>r[4]==='needs_review').length;
+  return summary;
+}
+
+// BEGIN GENERATED RECEIPT TEMPLATE
+const NF_RECEIPT_HTML="<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>{{SUBJECT}}</title></head><body style=\"margin:0;background:#f4f1ea;color:#242134;font-family:Arial,sans-serif;line-height:1.6\"><table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td align=\"center\" style=\"padding:24px 12px\"><table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"width:100%;max-width:600px;background:#fff;border-radius:16px;overflow:hidden\"><tr><td style=\"padding:24px 32px;background:#211c32;color:#f3ff80;font-size:24px;font-weight:700;letter-spacing:3px\">NANOFUN<span style=\"display:block;color:#dedbe8;letter-spacing:2px;font-size:11px\">YOUR LITTLE ARCADE</span></td></tr><tr><td style=\"padding:28px 32px\"><p style=\"margin:0;color:#777;font-size:11px;letter-spacing:2px\">PURCHASE CONFIRMATION</p><h1 style=\"font-size:24px;line-height:1.3;margin:8px 0 16px\">Thank you for your purchase.</h1><p>{{INTRO}}</p><table role=\"presentation\" width=\"100%\" cellpadding=\"8\" cellspacing=\"0\" style=\"background:#f6f5f9;border-radius:12px;font-size:14px\"><tr><td>Product</td><td align=\"right\"><strong>{{PRODUCT}}</strong></td></tr><tr><td>Quantity</td><td align=\"right\">1</td></tr><tr><td>Amount paid</td><td align=\"right\"><strong>{{AMOUNT}}</strong></td></tr><tr><td>Order reference</td><td align=\"right\" style=\"word-break:break-all\">{{REFERENCE}}</td></tr><tr><td>Payment date (UTC)</td><td align=\"right\">{{PAID_AT}}</td></tr></table><h2 style=\"font-size:17px;margin:24px 0 8px\">What you purchased</h2><p>{{ENTITLEMENT}}</p><p style=\"color:#666;font-size:13px\">{{BILLING_TERMS}}</p><p style=\"text-align:center;margin:28px 0\"><a href=\"https://nanofungames.com/\" style=\"display:inline-block;padding:13px 28px;border-radius:8px;background:#211c32;color:#f3ff80;text-decoration:none;font-weight:700\">Open NanoFun</a></p><p style=\"font-size:13px;color:#666\">Sign in with the same email used for this purchase. Open your wallet and select <strong>Restore purchases</strong> if your balance or access needs refreshing.</p>{{STRIPE_RECEIPT_LINK}}<p style=\"font-size:12px;color:#777;word-break:break-all\">Stripe order: {{ORDER_ID}}</p></td></tr><tr><td style=\"padding:20px 32px;background:#f6f5f9;font-size:12px;color:#777\">Payment merchant: PromptKami · Product: NanoFun Games<br>Need help? <a style=\"color:#575062\" href=\"mailto:superpowergames.us@gmail.com\">superpowergames.us@gmail.com</a><br>This is a purchase confirmation, not a tax invoice or a marketing subscription.</td></tr></table></td></tr></table></body></html>\n";
+// END GENERATED RECEIPT TEMPLATE
