@@ -5,26 +5,29 @@
   const client=window.NanoFunWalletClient.createWalletClient({endpoint});
   let wallet=null,selectedGame='volleyball',toastTimer,loading=true,loginEmail='';
   const games = {volleyball:{name:'皮卡丘打排球',path:'pikachu-volleyball/?v=wallet1',hint:'选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter',paid:'本场可玩到 15 分。'},'2048':{name:'2048',path:'2048/?v=wallet1',hint:'滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币',paid:'达到 2048 后可免费继续挑战。'},snake:{name:'贪吃蛇',path:'snake/?v=wallet1',hint:'滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币',paid:'吃果子得分，撞墙或撞到自己结束。'}};
-  const errors={login_required:'请用邮箱登录，恢复你的账户。',invalid_code:'验证码不正确，请重新输入。',code_expired:'验证码已过期，请重新发送。',try_later:'请求较多，请稍后再试。',insufficient_coins:'能量已用完，登录后领取每日能量。',verified_email_required:'请先验证邮箱。',previous_game_round_pending:'上次开局仍待确认，请先返回上一款游戏重试。',previous_account_round_pending:'上一账户有待确认的开局，请先恢复该账户。',checkout_not_ready:'请先登录邮箱，或稍后重试付款入口。',stripe_not_configured:'付款服务暂不可用，请稍后再试。',stripe_unavailable:'订单核验暂不可用，请稍后点击恢复购买。',order_owner_mismatch:'请登录付款时使用的同一邮箱。仍未到账时，请联系客服并提供订单号。',payment_not_verified:'付款尚未核验成功，请稍后点击恢复购买。不要重复付款。',multiple_subscriptions_need_review:'此账户已有订阅，请联系客服管理续费，避免重复订阅。',billing_coverage_incomplete:'订单仍在核对，请稍后恢复购买或联系客服。'};
+  const errors={mail_sender_not_ready:'邮件登录正在维护。已有钱包仍可继续游戏，请稍后重试。',login_required:'请用邮箱登录，恢复你的账户。',invalid_code:'验证码不正确，请重新输入。',code_expired:'验证码已过期，请重新发送。',try_later:'请求较多，请稍后再试。',insufficient_coins:'能量已用完，登录后领取每日能量。',verified_email_required:'请先验证邮箱。',previous_game_round_pending:'上次开局仍待确认，请先返回上一款游戏重试。',previous_account_round_pending:'上一账户有待确认的开局，请先恢复该账户。',checkout_not_ready:'请先登录邮箱，或稍后重试付款入口。',stripe_not_configured:'付款服务暂不可用，请稍后再试。',stripe_unavailable:'订单核验暂不可用，请稍后点击恢复购买。',order_owner_mismatch:'请登录付款时使用的同一邮箱。仍未到账时，请联系客服并提供订单号。',payment_not_verified:'付款尚未核验成功，请稍后点击恢复购买。不要重复付款。',multiple_subscriptions_need_review:'此账户已有订阅，请联系客服管理续费，避免重复订阅。',billing_coverage_incomplete:'订单仍在核对，请稍后恢复购买或联系客服。'};
   const message=e=>errors[e.message]||'连接暂时失败。请重试；开局请求会核对原编号，不会重复扣币。';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),4000);}
   function render(){
     const total=wallet?.coins;
     ['header-balance','cabinet-coins','wallet-balance'].forEach(id=>$(id).textContent=Number.isSafeInteger(total)?total:'—');
     const email=wallet?.kind==='email';
+    const mailPending=wallet?.mail_ready===false;
+    $('email-send').disabled=loading||mailPending;
     $('email-form').hidden=email;$('account-panel').hidden=!wallet;$('code-form').hidden=email||!loginEmail;
     $('account-label').textContent=wallet?.email_label||'连接钱包中…';
     $('guest-status').textContent=loading?'正在连接你的钱包…':email?'账户余额已同步，换设备登录也能恢复。':wallet?'游客体验：首次 5 枚能量，开局扣 1 枚；登录后恢复账户并领取每日能量。':'填写邮箱，恢复你的账户余额。';
+    if(!loading&&mailPending)$('guest-status').textContent='邮箱登录与购买正在维护，已有钱包可继续游戏。';
     $('daily-button').hidden=!email;$('daily-button').disabled=!wallet?.daily_available;
     $('daily-button').textContent=wallet?.daily_available?'领取今日 10 枚能量':'今日已领取 · 明天再来';
     $('wallet-play').hidden=!(wallet?.is_vip||total>0);
     $('coins-buy').disabled=!wallet?.checkout_ready?.coins_50;
-    $('coins-buy').textContent=wallet?.checkout_ready?.coins_50?'购买 50 枚能量 · $0.99':'验证邮箱后购买';
+    $('coins-buy').textContent=wallet?.checkout_ready?.coins_50?'购买 50 枚能量 · $0.99':mailPending?'发信配置中 · 暂停购买':'验证邮箱后购买';
     $('restore-orders').hidden=!wallet?.paid_enabled;
     $('payment-test-note').hidden=!email;
     $('payment-test-note').textContent='请在 Stripe 使用当前账户的邮箱付款。到账后会发送购买回执；未返回本站也可点击恢复购买。';
     $('vip-buy').disabled=!wallet?.checkout_ready?.vip_year;
-    $('vip-buy').textContent=wallet?.checkout_ready?.vip_year?'订阅年度 VIP · $9.99 / 年':wallet?.is_vip?'年度 VIP 已生效':wallet?.has_subscription?'已有订阅 · 联系客服管理':'验证邮箱后订阅';
+    $('vip-buy').textContent=wallet?.checkout_ready?.vip_year?'订阅年度 VIP · $9.99 / 年':mailPending?'发信配置中 · 暂停购买':wallet?.is_vip?'年度 VIP 已生效':wallet?.has_subscription?'已有订阅 · 联系客服管理':'验证邮箱后订阅';
     $('vip-manage').hidden=!wallet?.has_subscription;
     $('reward-button').disabled=true;
     $('reward-status').textContent='广告仍在审核，暂不播放或发放广告奖励。';

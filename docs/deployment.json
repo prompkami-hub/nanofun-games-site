@@ -2,8 +2,9 @@
   "repository": "prompkami-hub/nanofun-games-site",
   "migration": "nanofun-2026-11-05",
   "content_base_commit": "efef3799445e743068f54cc75b3ae47e72e7b4df",
-  "release": "public-billing-v5",
-  "released_at": "2026-11-08T05:01:18.421428+00:00",
-  "wallet_api_version": "public-billing-5",
-  "game_pack": "wallet-v1.pck"
+  "release": "ee-sender-migration-hold",
+  "released_at": "2026-11-08T07:06:33.847700+00:00",
+  "wallet_api_version": "ee-sender-gate-6",
+  "game_pack": "wallet-v1.pck",
+  "mail_sender_status": "brand_authorization_and_pairing_pending"
 }

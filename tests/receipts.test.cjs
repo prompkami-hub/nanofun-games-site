@@ -1,8 +1,8 @@
 const fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto'),{test}=require('node:test'),assert=require('node:assert/strict');
 function harness(){
- const rows=[],sent=[],props=new Map([['RECEIPT_OUTBOX_READY','true'],['RECEIPT_EMAIL_SINCE','1700000000']]);let quota=100,failSend=false,failSentWrite=false;
+ const rows=[],sent=[],props=new Map([['MAIL_RELAY_URL','https://script.google.com/macros/s/unit_test/exec'],['MAIL_RELAY_SECRET','unit-test-only-not-an-authentication-secret'],['OUTBOUND_IDENTITY_CONFIRMED','superpowergames.us@gmail.com'],['RECEIPT_OUTBOX_READY','true'],['RECEIPT_EMAIL_SINCE','1700000000']]);let quota=100,failSend=false,failSentWrite=false;
  const b={console:{log(){},warn(){}},PropertiesService:{getScriptProperties:()=>({getProperty:k=>props.get(k)||null})},MailApp:{getRemainingDailyQuota:()=>quota,sendEmail:m=>{if(failSend)throw Error('network_unknown');sent.push(m);}}};
- vm.runInNewContext(fs.readFileSync('apps-script/Code.gs','utf8'),b);b.nfLocked=fn=>fn();b.nfHash=s=>crypto.createHash('sha256').update(s).digest('hex');b.nfRows=()=>[['nf_buyer','buyer@example.com','active']];b.nfReceiptRows=()=>rows.map(r=>r.slice());
+ vm.runInNewContext(fs.readFileSync('apps-script/Code.gs','utf8'),b);b.nfRelaySend=m=>{if(quota<1){const e=Error('mail_quota_exhausted');e.notSent=true;throw e;}b.MailApp.sendEmail(m);return {ok:true,sender:'superpowergames.us@gmail.com'};};b.nfLocked=fn=>fn();b.nfHash=s=>crypto.createHash('sha256').update(s).digest('hex');b.nfRows=()=>[['nf_buyer','buyer@example.com','active']];b.nfReceiptRows=()=>rows.map(r=>r.slice());
  b.nfSheet=()=>({appendRow:r=>rows.push(r),getRange:(row)=>({setValues:values=>{if(failSentWrite&&values[0][4]==='sent')throw Error('sheet_unavailable');rows[row-2]=values[0].slice();}})});
  return {b,rows,sent,props,quota:v=>quota=v,failSend:()=>failSend=true,failSentWrite:()=>failSentWrite=true};
 }
@@ -19,6 +19,13 @@ test('Template rejects unverified values and off-domain receipt links; source HT
 test('Outbox queues once per paid order; no receipt is sent until sending is explicitly enabled',()=>{
  const h=harness();assert.equal(h.b.nfTryQueueReceipt(coin()),'queued');assert.equal(h.b.nfTryQueueReceipt(coin()),'queued');assert.equal(h.rows.length,1);assert.equal(h.b.processNanoFunReceiptOutbox().disabled,true);assert.equal(h.sent.length,0);
  h.props.set('RECEIPT_EMAIL_ENABLED','true');assert.equal(h.b.processNanoFunReceiptOutbox().sent,1);assert.equal(h.sent.length,1);assert.equal(h.sent[0].to,'buyer@example.com');assert.equal(h.sent[0].name,'NanoFun Games');assert.equal(h.rows[0][4],'sent');assert.equal(h.b.processNanoFunReceiptOutbox().sent,0);assert.equal(h.sent.length,1);
+});
+test('Unconfirmed brand sender blocks login mail and holds receipts without consuming a send claim',()=>{
+ const h=harness();h.props.delete('OUTBOUND_IDENTITY_CONFIRMED');
+ assert.throws(()=>h.b.nfRequestLogin('buyer@example.com'),/mail_sender_not_ready/);
+ assert.throws(()=>h.b.nfSendPublicMail({to:'buyer@example.com',subject:'test',body:'test'}),/mail_sender_not_ready/);
+ h.b.nfTryQueueReceipt(coin());h.props.set('RECEIPT_EMAIL_ENABLED','true');
+ assert.equal(h.b.processNanoFunReceiptOutbox().disabled,true);assert.equal(h.rows[0][4],'queued');assert.equal(h.sent.length,0);
 });
 test('Renewal deduplicates by invoice, independent of repeated checkout reconciliation; a new paid invoice gets one new receipt',()=>{
  const h=harness(),info={...coin(),kind:'vip_renewal',amountCents:999,vipUntil:1825644000000,key:'invoice:in_first'};h.b.nfTryQueueReceipt(info);h.b.nfTryQueueReceipt(info);h.b.nfTryQueueReceipt({...info,key:'invoice:in_second',paidAt:1825644000,vipUntil:1857180000000});assert.equal(h.rows.length,2);

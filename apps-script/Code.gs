@@ -2,6 +2,7 @@
  * Secrets live only in Script Properties. Run setup once as the Sheet owner.
  * Public API never accepts balances, VIP flags or nanofun_reward as proof.
  */
+const NF_PUBLIC_EMAIL = 'superpowergames.us@gmail.com';
 const NF_SHEET_ID = '1SChQqOESMElH1Ikvo9zRexxySpbaL4X3hoSQLquI_UA';
 const NF_HEADERS = {
   Players: ['PlayerId','Email','Status','Coins','VipExpiresAt','StripeCustomerId','StripeSubscriptionId','UpdatedAt'],
@@ -21,7 +22,7 @@ function setup() {
   });
 }
 function nfJson(value){return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);}
-function doGet(){return nfJson({service:'nanofun-wallet',schema:5,version:'public-billing-5',paid_enabled:PropertiesService.getScriptProperties().getProperty('BILLING_ENABLED')==='true'&&!PropertiesService.getScriptProperties().getProperty('BILLING_TEST_EMAIL'),ads_enabled:false});}
+function doGet(){return nfJson({service:'nanofun-wallet',schema:7,version:'ee-mail-relay-7',mail_transport:'brand_relay',mail_sender:NF_PUBLIC_EMAIL,paid_enabled:nfMailReady()&&PropertiesService.getScriptProperties().getProperty('BILLING_ENABLED')==='true'&&!PropertiesService.getScriptProperties().getProperty('BILLING_TEST_EMAIL'),ads_enabled:false});}
 function doPost(e){
   try {
     const raw=e&&e.postData&&e.postData.contents;
@@ -56,17 +57,34 @@ function nfAuthenticate(token){
   if(!/^nf_[0-9a-f-]{36}$/.test(p.id)||!Number.isFinite(p.expires)||p.expires<Date.now())throw Error('login_required');
   return p.id;
 }
+// Confirm only after a real message header proves the ee sending identity.
+// No fallback to the internal execution owner's email during migration.
+function nfMailReady(){const p=PropertiesService.getScriptProperties();return p.getProperty('OUTBOUND_IDENTITY_CONFIRMED')===NF_PUBLIC_EMAIL&&/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(p.getProperty('MAIL_RELAY_URL')||'')&&String(p.getProperty('MAIL_RELAY_SECRET')||'').length>=32;}
+function nfRelaySend(message,operation){
+  const p=PropertiesService.getScriptProperties(),url=p.getProperty('MAIL_RELAY_URL'),secret=p.getProperty('MAIL_RELAY_SECRET');
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url||'')||String(secret||'').length<32)throw Error('mail_sender_not_ready');
+  const payload=JSON.stringify({operation,to:message.to,subject:message.subject,body:message.body,...(message.htmlBody?{htmlBody:message.htmlBody}:{})}),at=Date.now(),nonce=Utilities.getUuid();
+  const signature=nfB64(Utilities.computeHmacSha256Signature(at+'\n'+nonce+'\n'+payload,secret));
+  let response;
+  try{response=UrlFetchApp.fetch(url,{method:'post',contentType:'application/json',payload:JSON.stringify({at,nonce,payload,signature}),muteHttpExceptions:true});}catch(_){throw Error('mail_delivery_unknown');}
+  if(response.getResponseCode()!==200)throw Error('mail_delivery_unknown');
+  let result;try{result=JSON.parse(response.getContentText());}catch(_){throw Error('mail_delivery_unknown');}
+  if(!result.ok||result.sender!==NF_PUBLIC_EMAIL){const e=Error(result.not_sent?'mail_sender_unavailable':'mail_delivery_unknown');e.notSent=result.not_sent===true;throw e;}
+  return result;
+}
+function nfSendPublicMail(message,operation){if(!nfMailReady())throw Error('mail_sender_not_ready');return nfRelaySend(message,operation);}
 function nfRequestLogin(value){
+  if(!nfMailReady())throw Error('mail_sender_not_ready');
   const email=nfEmail(value),cache=CacheService.getScriptCache(),key='otp:'+nfHash(email);
   return nfLocked(()=>{
     if(cache.get(key+':cooldown'))throw Error('try_later');
     const day=Utilities.formatDate(new Date(),'America/Los_Angeles','yyyyMMdd'),budget='otp_budget:'+day;
     const props=PropertiesService.getScriptProperties(),count=Number(props.getProperty(budget)||0);
-    if(count>=50||MailApp.getRemainingDailyQuota()<1)throw Error('try_later');
+    if(count>=50)throw Error('try_later');
     const code=String(parseInt(Utilities.getUuid().replace(/-/g,'').slice(0,8),16)%1000000).padStart(6,'0');
     cache.put(key,JSON.stringify({hash:nfHash(code),attempts:0,expires:Date.now()+600000}),600);cache.put(key+':cooldown','1',60);
     props.setProperty(budget,String(count+1));
-    MailApp.sendEmail({to:email,subject:'NanoFun sign-in code',body:'Your NanoFun sign-in code is '+code+'. It expires in 10 minutes. If you did not request this, ignore this email.'});
+    nfSendPublicMail({to:email,subject:'NanoFun sign-in code',body:'Your NanoFun sign-in code is '+code+'. It expires in 10 minutes. If you did not request this, ignore this email.'},'login:'+Utilities.getUuid());
     return {ok:true,status:'code_sent'};
   });
 }
@@ -132,11 +150,11 @@ function nfWallet(id){
   const properties=PropertiesService.getScriptProperties();
   const guest=String(players[index][1]).startsWith('guest:');
   const testEmail=properties.getProperty('BILLING_TEST_EMAIL');
-  const coinReady=!guest&&(!testEmail||testEmail===players[index][1])&&properties.getProperty('BILLING_ENABLED')==='true'&&!!properties.getProperty('STRIPE_READ_KEY');
+  const coinReady=nfMailReady()&&!guest&&(!testEmail||testEmail===players[index][1])&&properties.getProperty('BILLING_ENABLED')==='true'&&!!properties.getProperty('STRIPE_READ_KEY');
   const vipReady=coinReady&&properties.getProperty('VIP_CHECKOUT_ENABLED')==='true'&&!players[index][6];
   const email=String(players[index][1]),parts=email.split('@');
   const day=Utilities.formatDate(new Date(),'America/Los_Angeles','yyyyMMdd');
-  return {ok:true,player_id:id,kind:guest?'guest':'email',email_label:guest?'Guest':parts[0].slice(0,2)+'***@'+parts[1],coins:Math.max(0,coins),coin_adjustment_pending:Math.max(0,-coins),vip_expires_at:until||null,is_vip:until>Date.now(),has_subscription:!!players[index][6],daily_available:!guest&&!entries.some(r=>r[0]==='daily:'+id+':'+day),paid_enabled:coinReady,checkout_ready:{coins_50:coinReady,vip_year:vipReady},ads_enabled:false};
+  return {ok:true,player_id:id,kind:guest?'guest':'email',email_label:guest?'Guest':parts[0].slice(0,2)+'***@'+parts[1],coins:Math.max(0,coins),coin_adjustment_pending:Math.max(0,-coins),vip_expires_at:until||null,is_vip:until>Date.now(),has_subscription:!!players[index][6],mail_ready:nfMailReady(),daily_available:!guest&&!entries.some(r=>r[0]==='daily:'+id+':'+day),paid_enabled:coinReady,checkout_ready:{coins_50:coinReady,vip_year:vipReady},ads_enabled:false};
 }
 function nfDaily(id){
   const row=nfRows('Players').find(r=>r[0]===id);
@@ -301,7 +319,7 @@ function reconcileNanoFunBilling(){
 function installNanoFunBilling(){
   nfValidateBillingConfiguration();
   const props=PropertiesService.getScriptProperties();
-  props.setProperty('BILLING_TEST_EMAIL','pawfunstudios@gmail.com');
+  props.setProperty('BILLING_TEST_EMAIL',NF_PUBLIC_EMAIL);
   props.setProperty('BILLING_ENABLED','true');
   console.log('Owner-only 50-coin payment acceptance enabled; public checkout and annual VIP remain closed.');
 }
@@ -371,9 +389,8 @@ function nfTryQueueReceipt(info){
 }
 function processNanoFunReceiptOutbox(){
   const props=PropertiesService.getScriptProperties();const summary={sent:0,pending:0,delivery_unknown:0};
-  if(props.getProperty('RECEIPT_OUTBOX_READY')!=='true'||props.getProperty('RECEIPT_EMAIL_ENABLED')!=='true')return {...summary,disabled:true};
+  if(!nfMailReady()||props.getProperty('RECEIPT_OUTBOX_READY')!=='true'||props.getProperty('RECEIPT_EMAIL_ENABLED')!=='true')return {...summary,disabled:true};
   for(let n=0;n<10;n++){
-    if(MailApp.getRemainingDailyQuota()<1){summary.pending++;break;}
     const job=nfLocked(()=>{
       const rows=nfReceiptRows();
       rows.forEach((r,i)=>{if(r[4]==='sending'&&Date.now()-Date.parse(r[8])>600000){r[4]='delivery_unknown';r[9]='Interrupted send; reconcile Sent mailbox before retry';r[8]=new Date().toISOString();nfReceiptWrite(i,r);}});
@@ -386,10 +403,10 @@ function processNanoFunReceiptOutbox(){
     // MailApp has no provider idempotency key. A crash/uncertain send is held
     // for Sent-mail reconciliation, never automatically sent a second time.
     try{
-      MailApp.sendEmail({to:job.row[5],subject:job.message.subject,body:job.message.body,htmlBody:job.message.htmlBody,name:'NanoFun Games',replyTo:'superpowergames.us@gmail.com'});
+      nfSendPublicMail({to:job.row[5],subject:job.message.subject,body:job.message.body,htmlBody:job.message.htmlBody,name:'NanoFun Games',replyTo:NF_PUBLIC_EMAIL},'receipt:'+nfHash(job.row[0]));
       nfLocked(()=>{job.row[4]='sent';job.row[8]=new Date().toISOString();nfReceiptWrite(job.index,job.row);});summary.sent++;
     }catch(e){
-      nfLocked(()=>{job.row[4]='delivery_unknown';job.row[9]='Reconcile Sent mailbox by order reference before retry';job.row[8]=new Date().toISOString();nfReceiptWrite(job.index,job.row);});summary.delivery_unknown++;
+      nfLocked(()=>{job.row[4]=e.notSent?'queued':'delivery_unknown';job.row[9]=e.notSent?'Mail sender unavailable; no mail dispatched':'Reconcile Sent mailbox by order reference before retry';job.row[8]=new Date().toISOString();nfReceiptWrite(job.index,job.row);});if(e.notSent)break;summary.delivery_unknown++;
     }
   }
   const remaining=nfReceiptRows();

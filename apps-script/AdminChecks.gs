@@ -51,7 +51,7 @@ function runNanoFunSandboxAcceptance(){
     list.data.filter(s=>s.status==='complete'&&s.payment_status==='paid').forEach(s=>{
       const session=nfSandboxGet('checkout/sessions/'+s.id+'?expand[]=line_items');
       const items=session.line_items;
-      if(session.client_reference_id!=='nf_sandbox_acceptance'||nfEmail(session.customer_details?.email)!=='pawfunstudios@gmail.com'||nfObjectId(session.payment_link)!==plan.link||session.currency!=='usd'||session.amount_total!==plan.amount||session.mode!==plan.mode||!items||items.has_more||items.data.length!==1||items.data[0].quantity!==1||items.data[0].price.id!==plan.price||items.data[0].price.unit_amount!==plan.amount||items.data[0].price.currency!=='usd')throw Error('sandbox_order_not_verified');
+      if(session.client_reference_id!=='nf_sandbox_acceptance'||nfEmail(session.customer_details?.email)!==nfEmail(props.getProperty('SANDBOX_RECIPIENT_EMAIL')||'')||nfObjectId(session.payment_link)!==plan.link||session.currency!=='usd'||session.amount_total!==plan.amount||session.mode!==plan.mode||!items||items.has_more||items.data.length!==1||items.data[0].quantity!==1||items.data[0].price.id!==plan.price||items.data[0].price.unit_amount!==plan.amount||items.data[0].price.currency!=='usd')throw Error('sandbox_order_not_verified');
       let charge,coins=0,until=0,invoice;
       if(kind==='coins_50'){charge=nfSandboxCharge(nfObjectId(session.payment_intent),99);coins=nfCoinTarget(charge,{data:[],has_more:false});}
       else {
@@ -81,13 +81,14 @@ function runNanoFunSandboxAcceptance(){
   props.setProperty('sandbox_last_summary',JSON.stringify(result));console.log(JSON.stringify(result));return result;
 }
 function sendNanoFunSandboxReceipts(){
+  if(!nfMailReady())throw Error('mail_sender_not_ready');
   const sheet=SpreadsheetApp.openById(NF_SHEET_ID).getSheetByName('SandboxAcceptance');if(!sheet)throw Error('sandbox_acceptance_required');
   let sent=0;
   for(let i=2;i<=sheet.getLastRow();i++){
-    const payload=nfLocked(()=>{const row=sheet.getRange(i,1,1,7).getValues()[0];if(row[4]!=='queued'||MailApp.getRemainingDailyQuota()<1)return null;const p=JSON.parse(row[5]);nfRenderReceipt(p);sheet.getRange(i,5).setValue('sending');return p;});
+    const payload=nfLocked(()=>{const row=sheet.getRange(i,1,1,7).getValues()[0];if(row[4]!=='queued')return null;const p=JSON.parse(row[5]);nfRenderReceipt(p);sheet.getRange(i,5).setValue('sending');return p;});
     if(!payload)continue;
     const receipt=nfRenderReceipt(payload);
-    try{MailApp.sendEmail({to:'pawfunstudios@gmail.com',name:'NanoFun Games — Sandbox',subject:'[SANDBOX TEST — NO REAL PAYMENT] '+receipt.subject,body:'SANDBOX TEST ONLY. No real charge, coins or VIP access.\n\n'+receipt.body,htmlBody:'<p style="background:#ffe8a3;padding:20px;font-weight:bold">SANDBOX TEST ONLY — No real charge or production wallet entitlement.</p>'+receipt.htmlBody});sheet.getRange(i,5).setValue('sent');sent++;}
+    try{nfSendPublicMail({to:NF_PUBLIC_EMAIL,name:'NanoFun Games — Sandbox',subject:'[SANDBOX TEST — NO REAL PAYMENT] '+receipt.subject,body:'SANDBOX TEST ONLY. No real charge, coins or VIP access.\n\n'+receipt.body,htmlBody:'<p style="background:#ffe8a3;padding:20px;font-weight:bold">SANDBOX TEST ONLY — No real charge or production wallet entitlement.</p>'+receipt.htmlBody},'receipt:sandbox:'+nfHash(payload.orderId));sheet.getRange(i,5).setValue('sent');sent++;}
     catch(e){sheet.getRange(i,5).setValue('delivery_unknown');}
   }
   console.log(JSON.stringify({test_receipts_sent:sent,production_delivery_enabled:false}));
@@ -112,4 +113,20 @@ function releaseNanoFunPublicBilling(){
   props.deleteProperty('BILLING_TEST_EMAIL');
   props.setProperty('public_billing_released_at',new Date().toISOString());
   console.log(JSON.stringify({public_checkout_enabled:true,annual_vip_enabled:true,receipt_delivery_enabled:true,ads_enabled:false,real_payment_created:false}));
+}
+
+
+function probeEeMailSender(){
+  const operation='probe:'+Utilities.getUuid();
+  const r=nfRelaySend({to:NF_PUBLIC_EMAIL,subject:'NanoFun sender verification',body:'This is a NanoFun sender test. The From and Reply-To must both be superpowergames.us@gmail.com. No customer purchase or code is included.'},operation);
+  PropertiesService.getScriptProperties().setProperty('EE_MAIL_PROBE_ACCEPTED',r.sender===NF_PUBLIC_EMAIL?'true':'false');
+  console.log(JSON.stringify({sender:r.sender,accepted:r.ok,operation}));
+}
+// Run only after the operator reads the actual From header in the ee inbox.
+function confirmEeSenderAfterAcceptance(){
+  const deployed=JSON.parse(UrlFetchApp.fetch('https://script.google.com/macros/s/AKfycbwoez3VLfp9FNF4AtlrY66bMPH99_YigtJegkjKnkok2mp7AvxHXRNBP11ry8_3jsDbJw/exec').getContentText());if(deployed.version!=='ee-mail-relay-7'||deployed.mail_transport!=='brand_relay')throw Error('relay_backend_deployment_required');
+  const p=PropertiesService.getScriptProperties();if(p.getProperty('EE_MAIL_PROBE_ACCEPTED')!=='true')throw Error('brand_mail_acceptance_required');
+  p.setProperty('OUTBOUND_IDENTITY_CONFIRMED',NF_PUBLIC_EMAIL);
+  if(!nfMailReady()){p.deleteProperty('OUTBOUND_IDENTITY_CONFIRMED');throw Error('mail_sender_not_ready');}
+  console.log(JSON.stringify({public_sender:NF_PUBLIC_EMAIL,brand_mail_ready:true}));
 }
