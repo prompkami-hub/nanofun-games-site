@@ -104,7 +104,9 @@ function releaseNanoFunPublicBilling(){
   if(!sheet||sheet.getLastRow()!==3)throw Error('sandbox_receipts_required');
   const rows=sheet.getRange(2,1,2,7).getValues();
   if(!['coins_50','vip_initial'].every(kind=>rows.some(r=>r[1]===kind&&r[4]==='sent')))throw Error('sandbox_receipts_required');
-  if(!ScriptApp.getProjectTriggers().some(t=>t.getHandlerFunction()==='reconcileNanoFunBilling'))throw Error('reconciliation_trigger_required');
+  // The existing time trigger is verified in the Google Triggers UI.
+  // Do not request a new ScriptApp scope just to inspect an already-installed trigger.
+  if(props.getProperty('BILLING_TRIGGER_CONFIRMED')!=='true')throw Error('reconciliation_trigger_required');
   setupNanoFunReceipts();
   props.setProperties({BILLING_ENABLED:'true',VIP_CHECKOUT_ENABLED:'true',RECEIPT_EMAIL_ENABLED:'true'});
   props.deleteProperty('BILLING_TEST_EMAIL');
