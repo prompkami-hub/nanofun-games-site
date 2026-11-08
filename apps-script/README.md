@@ -45,7 +45,7 @@ A private read-only Stripe key was saved by the owner. Ten resource probes succe
 ### Latest acceptance status
 Live read key and ten GET checks passed. Both actual redirects were validated. The five-minute Head trigger was saved; its first manual scan returned processed=0, pending=0, errors=0, completed_links=2. No payment has been made.
 
-The initial owner-only live preview has been withdrawn: `BILLING_TEST_EMAIL=__awaiting_sandbox_acceptance__`, so no wallet gets an active purchase button. Keep it closed until isolated **Stripe Test mode** acceptance passes. Do not use real cards for live-mode testing (https://docs.stripe.com/testing). The separate `STRIPE_TEST_READ_KEY` has been prepared for the owner to create/save; do not overwrite the live key or use test orders to grant production credit. Earlier references to an owner purchase test mean sandbox-only acceptance; no real-money test should be requested.
+The initial owner-only live preview has been withdrawn: `BILLING_TEST_EMAIL=__awaiting_sandbox_acceptance__`, so no wallet gets an active purchase button. Keep it closed until isolated **Stripe Test mode** acceptance passes. Do not use real cards for live-mode testing (https://docs.stripe.com/testing). The owner saved a replacement `STRIPE_TEST_READ_KEY` privately; all nine sandbox resource checks passed. Do not overwrite the live key or use test orders to grant production credit. Earlier references to an owner purchase test mean sandbox-only acceptance; no real-money test should be requested.
 
 ## Transactional purchase confirmations (v4)
 
@@ -58,3 +58,14 @@ Reference: PromptKami handover `04-网站与收款.md` describes Stripe → priv
 - `processNanoFunReceiptOutbox` is called by the existing five-minute billing job. It does not run a second schedule and sends only if `RECEIPT_EMAIL_ENABLED=true`. That flag remains off throughout payment sandbox acceptance. Quota exhaustion leaves queued messages for a later run.
 - Claim is persisted before send. Since MailApp does not return an idempotency key/message ID, a send exception or interruption is held as delivery_unknown for Sent-mail reconciliation by unique order reference. It is never blindly retried, and provider acceptance is not proof of inbox delivery. This avoids duplicate automated sends but requires operator recovery of ambiguous failures.
 - Sandbox tests use mocks/isolated test data; no preview email is sent to a real payer, and no existing PromptKami contacts are imported. Production sends remain off until end-to-end acceptance and public billing release.
+
+
+## Isolated Stripe sandbox acceptance (2026-11-07, Los Angeles)
+
+`AdminChecks.gs` is an editor-only companion file, not a public API route. The test key is used for GET requests only. It rejects live credentials/objects and never logs credentials or customer details. Two separately named sandbox products/payment links match the production prices: 50 coins $0.99 once and VIP $9.99/year. Stripe's documented fake card was used; no real funds moved.
+
+`runNanoFunSandboxAcceptance` verifies actual paid sandbox Checkout Sessions, exact link/price/quantity, a fixed acceptance player and the owner's email. It reuses the production `nfCoinTarget`, `nfVipUntil` and `nfRenderReceipt` functions but writes exclusively to private `SandboxAcceptance`; it cannot write Players, Ledger or Receipts. First execution verified two orders, added two records, test balance 50, annual VIP valid. Re-execution added zero, balance stayed 50. This validates isolated Stripe/payment rules and persistence, not a browser-to-production-wallet checkout.
+
+`sendNanoFunSandboxReceipts` sends only to pawfunstudios@gmail.com, with a conspicuous sandbox/no-real-payment subject and banner; it claims before send and holds unknown outcomes. Both product messages were read back in the recipient INBOX via the official Gmail connector. Production sending stays off. Saving an old Script Properties form had removed receipt flags; `setupNanoFunReceipts` was run again successfully to restore the outbox configuration.
+
+Public checkout and production receipt sending remain closed. Do not mistake a passing read-key check, an isolated test balance, or test email delivery for a public production release. No new schedule or production entitlement was created.

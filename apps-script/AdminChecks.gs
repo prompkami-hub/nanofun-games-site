@@ -1,0 +1,94 @@
+/* Private editor-only diagnostics. Never return keys or customer/order details. */
+function verifyNanoFunSandboxConnection() {
+  const props=PropertiesService.getScriptProperties();
+  const key=props.getProperty('STRIPE_TEST_READ_KEY');
+  if(!key||!/^rk_test_/.test(key))throw Error('sandbox_read_key_required');
+  const checks={};
+  ['payment_links','checkout/sessions','events','invoices','subscriptions','charges','disputes','prices','payment_intents'].forEach(resource=>{
+    try {
+      const response=UrlFetchApp.fetch('https://api.stripe.com/v1/'+resource+'?limit=1',{headers:{Authorization:'Bearer '+key},muteHttpExceptions:true});
+      if(response.getResponseCode()!==200)throw Error('sandbox_resource_unavailable');
+      const value=JSON.parse(response.getContentText());
+      if(value.object!=='list'||!Array.isArray(value.data)||value.data.some(row=>row.livemode!==false))throw Error('sandbox_mode_not_verified');
+      checks[resource]={ok:true};
+    } catch(e) { checks[resource]={ok:false,error:e.message==='sandbox_mode_not_verified'?e.message:'sandbox_resource_unavailable'}; }
+  });
+  const summary={service:'nanofun-sandbox-readonly-check',checks,complete:Object.values(checks).every(c=>c.ok),checkout_disabled:props.getProperty('BILLING_TEST_EMAIL')==='__awaiting_sandbox_acceptance__',receipt_delivery_disabled:props.getProperty('RECEIPT_EMAIL_ENABLED')!=='true'};
+  console.log(JSON.stringify(summary));
+  return summary;
+}
+
+const NF_SANDBOX_PLANS={
+  coins_50:{link:'plink_1UZNr3CvKtvzDSIbfoBoo8bp',price:'price_1UZNpyCvKtvzDSIbvKUJbBel',amount:99,mode:'payment'},
+  vip_initial:{link:'plink_1UZNrqCvKtvzDSIbyf2WUP2G',price:'price_1UZNqQCvKtvzDSIbQxgKTTEM',amount:999,mode:'subscription'}
+};
+function nfSandboxGet(path){
+  const key=PropertiesService.getScriptProperties().getProperty('STRIPE_TEST_READ_KEY');
+  if(!/^rk_test_/.test(key||''))throw Error('sandbox_read_key_required');
+  const r=UrlFetchApp.fetch('https://api.stripe.com/v1/'+path,{headers:{Authorization:'Bearer '+key},muteHttpExceptions:true});
+  if(r.getResponseCode()!==200)throw Error('sandbox_resource_unavailable');
+  const value=JSON.parse(r.getContentText());
+  if(value.object!=='list'&&value.livemode!==false)throw Error('sandbox_mode_not_verified');
+  return value;
+}
+function nfSandboxCharge(intentId,amount){
+  if(!/^pi_[A-Za-z0-9]+$/.test(intentId||''))throw Error('sandbox_payment_not_verified');
+  const intent=nfSandboxGet('payment_intents/'+intentId+'?expand[]=latest_charge');
+  if(intent.status!=='succeeded'||intent.amount_received!==amount||intent.currency!=='usd')throw Error('sandbox_payment_not_verified');
+  const charge=typeof intent.latest_charge==='string'?nfSandboxGet('charges/'+intent.latest_charge):intent.latest_charge;
+  if(!charge||charge.livemode!==false||nfObjectId(charge.payment_intent)!==intentId||charge.disputed)throw Error('sandbox_charge_not_verified');
+  return charge;
+}
+// Deliberately separate from Players, Ledger, Receipts and every public API action.
+// Uses actual Stripe sandbox orders, but never grants production access.
+function runNanoFunSandboxAcceptance(){
+  const props=PropertiesService.getScriptProperties();
+  if(props.getProperty('BILLING_TEST_EMAIL')!=='__awaiting_sandbox_acceptance__'||props.getProperty('RECEIPT_EMAIL_ENABLED')==='true')throw Error('production_must_remain_closed');
+  const verified=[];
+  Object.entries(NF_SANDBOX_PLANS).forEach(([kind,plan])=>{
+    const list=nfSandboxGet('checkout/sessions?limit=25&payment_link='+plan.link);
+    if(list.has_more)throw Error('sandbox_coverage_incomplete');
+    list.data.filter(s=>s.status==='complete'&&s.payment_status==='paid').forEach(s=>{
+      const session=nfSandboxGet('checkout/sessions/'+s.id+'?expand[]=line_items');
+      const items=session.line_items;
+      if(session.client_reference_id!=='nf_sandbox_acceptance'||nfEmail(session.customer_details?.email)!=='pawfunstudios@gmail.com'||nfObjectId(session.payment_link)!==plan.link||session.currency!=='usd'||session.amount_total!==plan.amount||session.mode!==plan.mode||!items||items.has_more||items.data.length!==1||items.data[0].quantity!==1||items.data[0].price.id!==plan.price||items.data[0].price.unit_amount!==plan.amount||items.data[0].price.currency!=='usd')throw Error('sandbox_order_not_verified');
+      let charge,coins=0,until=0,invoice;
+      if(kind==='coins_50'){charge=nfSandboxCharge(nfObjectId(session.payment_intent),99);coins=nfCoinTarget(charge,{data:[],has_more:false});}
+      else {
+        const sub=nfSandboxGet('subscriptions/'+nfObjectId(session.subscription));
+        if(nfObjectId(sub.customer)!==nfObjectId(session.customer))throw Error('sandbox_owner_mismatch');
+        invoice=nfSandboxGet('invoices/'+nfObjectId(sub.latest_invoice)+'?expand[]=payments.data.payment.payment_intent');
+        let intent=nfObjectId(invoice.payment_intent);
+        if(!intent){const payments=(invoice.payments?.data||[]).filter(p=>p.status==='paid');if(invoice.payments?.has_more||payments.length!==1)throw Error('sandbox_invoice_not_verified');intent=nfObjectId(payments[0].payment?.payment_intent);}
+        charge=nfSandboxCharge(intent,999);until=nfVipUntil(sub,invoice,charge,{data:[],has_more:false},plan.price);
+        if(until<=Date.now())throw Error('sandbox_vip_not_active');
+      }
+      const paidAt=kind==='coins_50'?charge.created:invoice.status_transitions?.paid_at;
+      const payload={kind,orderId:session.id,reference:'NF-'+new Date(paidAt*1000).toISOString().slice(0,10).replace(/-/g,'')+'-'+nfHash('sandbox:'+session.id).slice(0,12).toUpperCase(),amountCents:plan.amount,currency:'usd',paidAt,coinsCredited:coins,vipUntil:until};
+      nfRenderReceipt(payload);
+      verified.push([session.id,kind,coins,until,'queued',JSON.stringify(payload),new Date().toISOString()]);
+    });
+  });
+  const result=nfLocked(()=>{
+    const book=SpreadsheetApp.openById(NF_SHEET_ID);let sheet=book.getSheetByName('SandboxAcceptance');
+    const headers=['TestOrderId','Kind','TestCoins','TestVipUntil','TestReceiptState','PayloadJson','UpdatedAt'];
+    if(!sheet){sheet=book.insertSheet('SandboxAcceptance');sheet.appendRow(headers);sheet.setFrozenRows(1);}
+    if(JSON.stringify(sheet.getRange(1,1,1,7).getValues()[0])!==JSON.stringify(headers))throw Error('sandbox_schema_mismatch');
+    const rows=sheet.getLastRow()>1?sheet.getRange(2,1,sheet.getLastRow()-1,7).getValues():[];let added=0;
+    verified.forEach(row=>{if(!rows.some(old=>old[0]===row[0])){sheet.appendRow(row);rows.push(row);added++;}});
+    return {verified:verified.length,added,test_coin_balance:rows.reduce((n,r)=>n+Number(r[2]),0),annual_vip_verified:rows.some(r=>r[1]==='vip_initial'&&Number(r[3])>Date.now()),production_wallet_touched:false};
+  });
+  props.setProperty('sandbox_last_summary',JSON.stringify(result));console.log(JSON.stringify(result));return result;
+}
+function sendNanoFunSandboxReceipts(){
+  const sheet=SpreadsheetApp.openById(NF_SHEET_ID).getSheetByName('SandboxAcceptance');if(!sheet)throw Error('sandbox_acceptance_required');
+  let sent=0;
+  for(let i=2;i<=sheet.getLastRow();i++){
+    const payload=nfLocked(()=>{const row=sheet.getRange(i,1,1,7).getValues()[0];if(row[4]!=='queued'||MailApp.getRemainingDailyQuota()<1)return null;const p=JSON.parse(row[5]);nfRenderReceipt(p);sheet.getRange(i,5).setValue('sending');return p;});
+    if(!payload)continue;
+    const receipt=nfRenderReceipt(payload);
+    try{MailApp.sendEmail({to:'pawfunstudios@gmail.com',name:'NanoFun Games — Sandbox',subject:'[SANDBOX TEST — NO REAL PAYMENT] '+receipt.subject,body:'SANDBOX TEST ONLY. No real charge, coins or VIP access.\n\n'+receipt.body,htmlBody:'<p style="background:#ffe8a3;padding:20px;font-weight:bold">SANDBOX TEST ONLY — No real charge or production wallet entitlement.</p>'+receipt.htmlBody});sheet.getRange(i,5).setValue('sent');sent++;}
+    catch(e){sheet.getRange(i,5).setValue('delivery_unknown');}
+  }
+  console.log(JSON.stringify({test_receipts_sent:sent,production_delivery_enabled:false}));
+}
