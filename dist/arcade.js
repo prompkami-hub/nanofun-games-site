@@ -19,9 +19,16 @@
     $('daily-button').textContent=wallet?.daily_available?'领取今日 10 枚能量':'今日已领取 · 明天再来';
     $('wallet-play').hidden=!(wallet?.is_vip||total>0);
     $('coins-buy').disabled=!wallet?.checkout_ready?.coins_50;
+    $('coins-buy').textContent=wallet?.checkout_ready?.coins_50?'Buy 50 coins — $0.99':'付费补能尚未开放';
+    $('restore-orders').hidden=!wallet?.paid_enabled;
+    $('payment-test-note').hidden=!wallet?.paid_enabled;
+    $('payment-test-note').textContent='Owner-only payment test. Use this same verified email at Stripe checkout. Public purchases and annual VIP are still closed.';
     $('vip-buy').disabled=!wallet?.checkout_ready?.vip_year;
+    $('vip-buy').textContent=wallet?.checkout_ready?.vip_year?'Subscribe — $9.99 / year':'年度通行证尚未开放';
     $('reward-button').disabled=true;
     $('reward-status').textContent='广告仍在审核，暂不播放或发放广告奖励。';
+    $('coin-adjustment').hidden=!wallet?.coin_adjustment_pending;
+    $('coin-adjustment').textContent=wallet?.coin_adjustment_pending?'Refund adjustment: '+wallet.coin_adjustment_pending+' coins will be offset against future coin credits. This is not a cash debt.':'';
     $('membership-status').textContent=wallet?.is_vip?'年度 VIP 有效至 '+new Date(wallet.vip_expires_at).toLocaleDateString():email?'已验证邮箱 · 账户余额由服务器记录':'游客钱包 · 验证邮箱后可跨设备恢复';
   }
   function accept(value){wallet=value;render();}
@@ -46,11 +53,14 @@
   });
   $('code-form').addEventListener('submit',async e=>{
     e.preventDefault();const button=e.submitter;button.disabled=true;
-    try{accept(await client.login(loginEmail,$('code').value.trim()));$('code').value='';loginEmail='';render();$('wallet-message').textContent='登录成功，账户余额已恢复。';}
+    try{accept(await client.login(loginEmail,$('code').value.trim()));$('code').value='';loginEmail='';render();$('wallet-message').textContent='登录成功，账户余额已恢复。';if(new URL(location.href).searchParams.get('session_id'))await verifyReturn();}
     catch(error){$('wallet-message').textContent=message(error);}finally{button.disabled=false;}
   });
   $('daily-button').addEventListener('click',async()=>{try{$('daily-button').disabled=true;accept((await client.daily()).wallet);$('wallet-message').textContent='今日能量已到账。';}catch(e){$('wallet-message').textContent=message(e);render();}});
   $('switch-account').addEventListener('click',()=>{client.logout();wallet=null;loginEmail='';render();$('wallet-message').textContent='已退出登录，填写邮箱恢复余额。';});
+  $('restore-orders').addEventListener('click',async()=>{
+    $('restore-orders').disabled=true;try{accept((await client.restoreOrders()).wallet);$('wallet-message').textContent='Purchases checked. Your verified balance is up to date.';}catch(e){$('wallet-message').textContent=message(e);}finally{$('restore-orders').disabled=false;}
+  });
   $('coins-buy').addEventListener('click',()=>{try{location.assign(client.checkoutUrl('coins_50'));}catch(e){$('wallet-message').textContent=message(e);}});
   $('vip-buy').addEventListener('click',()=>{try{location.assign(client.checkoutUrl('vip_year'));}catch(e){$('wallet-message').textContent=message(e);}});
   $('wallet-button').addEventListener('click',()=>openWallet());$('claim-entry').addEventListener('click',()=>openWallet());$('game-wallet').addEventListener('click',()=>openWallet());
@@ -78,7 +88,11 @@
     }catch(e){openWallet(message(e));return false;}
   }});
   window.addEventListener('storage',event=>{if(event.key==='nanofun.wallet.auth.v1')location.reload();});
-  const session=new URL(location.href).searchParams.get('session_id');
-  if(session)ready.then(async()=>{if(!wallet||wallet.kind!=='email'){openWallet('请登录付款时使用的邮箱，以核验订单。');return;}try{accept((await client.verifyCheckout(session)).wallet);openWallet('订单已核验，余额已更新。');history.replaceState({},'',location.pathname+location.hash);}catch(e){openWallet(message(e));}});
+  async function verifyReturn(){
+    const session=new URL(location.href).searchParams.get('session_id');if(!session)return;
+    if(!wallet||wallet.kind!=='email'){openWallet('请登录付款时使用的邮箱，以核验订单。');return;}
+    try{accept((await client.verifyCheckout(session)).wallet);openWallet('订单已核验，余额已更新。');history.replaceState({},'',location.pathname+location.hash);}catch(e){openWallet(message(e));}
+  }
+  if(new URL(location.href).searchParams.get('session_id'))ready.then(verifyReturn);
   render();
 })();

@@ -27,6 +27,7 @@
       refresh:()=>call('wallet'),
       start:operationId=>call('start',{operation_id:operationId}),
       daily:()=>call('daily'),
+      restoreOrders:()=>call('restore_orders'),
       // A return session ID requests server verification. URL flags never grant coins.
       verifyCheckout:sessionId=>call('verify_checkout',{session_id:sessionId}),
       checkoutUrl(plan){
