@@ -28,7 +28,7 @@ function step(g,input,dt){
  const limit=p.boost>0?57:drifting?34:40;
  const acceleration=throttle*(p.boost>0?25:14)-3.6-(input.brake?30:0);
  p.speed=clamp(p.speed+acceleration*dt,0,limit);
- const target=steer*(drifting?14:10)*(.25+p.speed/40)-curve*p.speed*p.speed*.20;
+ const target=-steer*(drifting?14:10)*(.25+p.speed/40)-curve*p.speed*p.speed*.20;
  p.lateral+=(target-p.lateral)*Math.min(1,dt*8);p.d+=p.lateral*dt;
  if(Math.abs(p.d)>6.15){p.speed=Math.min(20,Math.max(0,p.speed-5*dt));p.d=clamp(p.d,-6.8,6.8);}
  const before=Math.floor(p.s/g.road.length);p.s+=p.speed*dt;
@@ -40,6 +40,9 @@ function step(g,input,dt){
  if(p.s>=g.road.length*g.laps){g.finished=true;g.events.push('finish');}
  return g;
 }
+// Track d is positive toward the chase camera's LEFT. Input steer remains screen-right positive.
+function steerFromDrag(deltaX){return clamp(Number(deltaX)/55||0,-1,1);}
+function steeringYaw(lateral,speed,drifting,steer){return lateral/Math.max(15,speed)-(drifting?steer*.32:0);}
 function resetCar(g){g.player.d=0;g.player.speed=0;g.player.lateral=0;g.player.boost=0;g.player.drifting=false;g.player.driftTime=0;}
-const api={track,sample,bend,create,step,rank,resetCar,clamp};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.DriftCoastEngine=api;
+const api={track,sample,bend,create,step,rank,resetCar,steerFromDrag,steeringYaw,clamp};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.DriftCoastEngine=api;
 })(globalThis);
