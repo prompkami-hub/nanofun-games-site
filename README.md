@@ -20,7 +20,7 @@ All three game cabinets await server authorization before starting or restarting
 The web game polls the host touch bridge for movement and one-shot actions. Existing WASD/R and arrow/Enter keyboard controls remain available. The earlier `.openai/hosting.json` is not the GitHub Pages deployment configuration.
 
 ## 2048 and Snake
-Three playable cabinets share the server wallet. New games keep independent sources in the games repository; only index.html, style.css, engine.js and app.js are deployed under docs/games. Each explicit start costs one coin; pause and continue are free. Leaving the cabinet ends the run. Both games support keyboard and mobile gestures; Snake also has direction buttons. Scores are browser-local.
+Three playable cabinets share the server wallet. New games keep independent sources in the games repository; only index.html, style.css, engine.js and app.js are deployed under docs/games. Each explicit start costs one coin; pause and continue are free. Leaving the cabinet ends the run. Both games support keyboard and mobile gestures; Snake uses the same one-swipe-on-release control as 2048, without direction buttons. Scores are browser-local.
 
 
 Guest access survives refresh while browser data is retained. Clearing storage or using another profile can create a new guest; this is not strong anti-abuse protection. Server quotas and verified email are the current limits. Existing browser-local demo balances are not paid funds and are not imported as server credit.

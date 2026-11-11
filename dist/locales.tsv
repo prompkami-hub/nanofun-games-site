@@ -59,7 +59,6 @@
 点击游戏内开始按钮投 1 枚模拟币。	Press Start in the game to spend 1 demo coin.	ゲーム内のスタートで1デモコインを使用します。	Pulsa Iniciar en el juego para usar 1 moneda.	게임 안에서 시작을 누르면 체험 코인 1개를 사용합니다.
 选择模式时扣 1 币 / 场 · 左侧 WASD＋R · 右侧方向键＋Enter	1 coin per match · P1: WASD + R · P2: arrows + Enter	1試合1コイン · P1: WASD＋R · P2: 矢印＋Enter	1 moneda por partida · J1: WASD + R · J2: flechas + Enter	경기당 코인 1개 · P1: WASD+R · P2: 방향키+Enter
 滑动棋盘或使用方向键 / WASD · 开始和重开扣 1 币	Swipe or use arrows / WASD · Start or restart: 1 coin	スワイプまたは矢印 / WASD · 開始・やり直しは1コイン	Desliza o usa flechas / WASD · Iniciar o reiniciar: 1 moneda	밀기 또는 방향키 / WASD · 시작·재시작 시 코인 1개
-滑动、方向按钮或方向键 / WASD · 开始和重开扣 1 币	Swipe, touch buttons or arrows / WASD · Start or restart: 1 coin	スワイプ・方向ボタン・矢印 / WASD · 開始・やり直しは1コイン	Desliza, usa botones o flechas / WASD · Iniciar o reiniciar: 1 moneda	밀기·화면 버튼·방향키 / WASD · 시작·재시작 시 코인 1개
 得分	Score	スコア	Puntos	점수
 最佳	Best	ベスト	Récord	최고
 游戏音效	Sound effects	効果音	Efectos de sonido	게임 효과음
@@ -85,7 +84,6 @@
 吃掉粉色果子，让小蛇慢慢长大。	Eat pink fruit to grow your snake.	ピンクの果物でヘビを育てよう。	Come frutas rosas para que crezca tu viborita.	분홍 과일을 먹고 뱀을 키우세요.
 别碰墙，也别咬到自己。	Avoid the walls and your own tail.	壁や自分の体にぶつからないように。	No choques con las paredes ni con tu cuerpo.	벽이나 자기 몸에 부딪히지 마세요.
 手机在棋盘上滑动	On mobile, swipe the board	スマホは盤面をスワイプ	En celular, desliza sobre el tablero	모바일에서는 보드를 밀어 주세요
-手机滑动 / 下方方向按钮	Swipe / On-screen direction buttons	スワイプ / 方向ボタン	Desliza / Botones de dirección	밀기 / 화면 방향 버튼
 相同数字碰撞合并	Matching numbers merge	同じ数字を合体	Los números iguales se combinan	같은 숫자를 합칩니다
 每步加入一个 2 或 4	A 2 or 4 appears after each move	毎回2か4が出現	Cada movimiento agrega un 2 o un 4	움직일 때마다 2 또는 4가 생깁니다
 吃一颗 +10 分	Each fruit: +10 points	果物1個で＋10点	Cada fruta: +10 puntos	과일 하나당 +10점
