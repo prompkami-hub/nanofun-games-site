@@ -50,3 +50,7 @@ The ee-owned mail relay is authorized, privately paired and deployed. An actual 
 The arcade links to public, script-free game guides at `/2048.html`, `/snake.html` and `/volleyball.html`. They describe real controls, rules, coin use and troubleshooting without requiring a wallet or login. Canonical URLs and sitemap entries use the HTTPS production domain. Advertising remains disabled until actual approval and reward verification.
 
 Run `python3 scripts/check_public_site.py --base http://127.0.0.1:4173/` for the local preview, or omit `--base` for production. This read-only smoke check requests public pages with both AdSense crawler User-Agent strings; it does not impersonate a verified Google-origin request, access customer wallets, activate ads or predict approval. The live AdSense result remains authoritative.
+
+## Drift Coast
+
+Original 3D arcade racing is the fourth cabinet. Runtime at `docs/games/drift-coast/`, private source in the games repository. Its one/three lap race awaits the existing NanoArcade round gate; pause/resume do not create a new paid start. Five AI opponents, coastal and alpine circuits, drift charge, nitro and mini turbo; keyboard and phone controls. WebGL is required. Procedural original visuals and synthesized sound; vendored Three.js 0.160.1 retains its MIT notice. Public rules at `/drift-coast.html`. No source or assets copied from the supplied reference game.

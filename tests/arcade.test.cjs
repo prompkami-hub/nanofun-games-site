@@ -24,9 +24,9 @@ test('Server-authorized guest rounds: opening free, five starts, sixth blocked',
  assert.equal(h.node('reward-button').disabled,true);assert.equal(h.node('coins-buy').disabled,true);assert.equal(h.node('vip-buy').disabled,true);
  h.click('exit-game');const count=h.calls();assert.equal(await h.window.NanoArcade.requestMatch(),false);assert.equal(h.calls(),count);
 });
-test('Three game cabinets await authorization; orientation gate never spends a coin',async()=>{
+test('All four game cabinets await authorization; orientation gate never spends a coin',async()=>{
  const h=await harness();h.click('play-button');h.window.NanoOrientation={prepare:()=>false};assert.equal(await h.window.NanoArcade.requestMatch(false),false);assert.equal(h.calls(),0);h.click('exit-game');
- for(const game of ['2048','snake']){const before=h.balance();h.click('play-'+game);assert.match(h.node('game-frame-host').firstChild.src,new RegExp('games/'+game+'/'));assert.equal(h.balance(),before);assert.equal(await h.window.NanoArcade.requestMatch(),true);assert.equal(h.balance(),before-1);h.click('exit-game');}
+ for(const game of ['2048','snake','drift-coast']){const before=h.balance();h.click('play-'+game);assert.match(h.node('game-frame-host').firstChild.src,new RegExp('games/'+game+'/'));assert.equal(h.balance(),before);assert.equal(await h.window.NanoArcade.requestMatch(),true);assert.equal(h.balance(),before-1);h.click('exit-game');}
 });
 test('Unavailable server wallet fails closed instead of trusting local demo coins',async()=>{
  const h=await harness({fail:true});h.click('play-snake');assert.equal(await h.window.NanoArcade.requestMatch(),false);assert.equal(h.calls(),0);assert.equal(h.node('wallet-dialog').open,true);
