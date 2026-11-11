@@ -44,3 +44,9 @@ Customer information: [billing help](https://nanofungames.com/help.html#billing)
 ## EE brand mail verified; billing restored
 
 The ee-owned mail relay is authorized, privately paired and deployed. An actual inbox test verified both From and Reply-To as superpowergames.us@gmail.com (NanoFun Games), signed by gmail.com. Wallet deployment 8 / schema7 ee-mail-relay-7 uses brand_relay; paid_enabled=true and ads_enabled=false. The production coin-pack and annual-VIP controls are enabled. Existing private player/Stripe administration remains separate from public sender identity. No real-money self-purchase was performed. Secret values are absent from source and logs.
+
+## Public content and crawler checks
+
+The arcade links to public, script-free game guides at `/2048.html`, `/snake.html` and `/volleyball.html`. They describe real controls, rules, coin use and troubleshooting without requiring a wallet or login. Canonical URLs and sitemap entries use the HTTPS production domain. Advertising remains disabled until actual approval and reward verification.
+
+Run `python3 scripts/check_public_site.py --base http://127.0.0.1:4173/` for the local preview, or omit `--base` for production. This read-only smoke check requests public pages with both AdSense crawler User-Agent strings; it does not impersonate a verified Google-origin request, access customer wallets, activate ads or predict approval. The live AdSense result remains authoritative.

@@ -1,1 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://nanofungames.com/</loc></url><url><loc>https://nanofungames.com/help.html</loc></url><url><loc>https://nanofungames.com/privacy.html</loc></url></urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://nanofungames.com/</loc></url>
+  <url><loc>https://nanofungames.com/2048.html</loc></url>
+  <url><loc>https://nanofungames.com/snake.html</loc></url>
+  <url><loc>https://nanofungames.com/volleyball.html</loc></url>
+  <url><loc>https://nanofungames.com/help.html</loc></url>
+  <url><loc>https://nanofungames.com/privacy.html</loc></url>
+</urlset>
