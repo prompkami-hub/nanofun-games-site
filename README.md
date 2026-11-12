@@ -62,3 +62,8 @@ Original first-person robot-combat fifth cabinet, runtime `docs/games/signal-bre
 ## Shadow Grove upgrade
 
 The fifth cabinet retains signal-breaker game ID / public URL and now runs an original rainy bamboo village/shrine variant with spinning swept-collision shuriken, finite12+48pouch/supply caches, timed facing seal interactions, capped reinforcement waves, jump, crouch and focused aim. New cache revision shadow2 invalidates the previous carbine runtime. Public controls/guide and cover reflect the new gameplay. Original independently implemented code/assets; no claim of complete Saltline equivalence. Wallet/payments/ads backend unchanged.
+
+
+## Shadow Grove environment revision grove3
+
+Original instanced modular village: individual roof tiles, timber/stone foundations, lattice windows, rain chains, silk banners, gate rope/paper wards, bamboo and leaf dressing. Canvas-authored material relief, directional shadows, local reflection probe, GPU rain streaks, wet courtyards and detailed sentinel/hand models. Desktop/mobile geometry budgets differ; actual gameplay image replaces schematic cover. Existing mission, wallet, touch and billing interfaces preserved. No Saltline source/assets copied.
