@@ -20,7 +20,7 @@ class Links(HTMLParser):
 
 def run(base):
     origin=base.rstrip('/')+'/'
-    paths=['','ads.txt','robots.txt','sitemap.xml','help.html','privacy.html','2048.html','snake.html','volleyball.html','drift-coast.html','games/drift-coast/','games/2048/','games/snake/','games/pikachu-volleyball/']
+    paths=['','ads.txt','robots.txt','sitemap.xml','help.html','privacy.html','2048.html','snake.html','volleyball.html','drift-coast.html','signal-breaker.html','games/signal-breaker/','games/drift-coast/','games/2048/','games/snake/','games/pikachu-volleyball/']
     results=[]
     def get(url, agent):
         try:

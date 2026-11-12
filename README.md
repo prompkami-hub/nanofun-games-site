@@ -54,3 +54,7 @@ Run `python3 scripts/check_public_site.py --base http://127.0.0.1:4173/` for the
 ## Drift Coast
 
 Original 3D arcade racing is the fourth cabinet. Runtime at `docs/games/drift-coast/`, private source in the games repository. Its one/three lap race awaits the existing NanoArcade round gate; pause/resume do not create a new paid start. Five AI opponents, coastal and alpine circuits, drift charge, nitro and mini turbo; keyboard and phone controls. WebGL is required. Procedural original visuals and synthesized sound; vendored Three.js 0.160.1 retains its MIT notice. Public rules at `/drift-coast.html`. No source or assets copied from the supplied reference game.
+
+## Signal Breaker
+
+Original first-person robot-combat fifth cabinet, runtime `docs/games/signal-breaker/`, private source in nanofun-games. Three relays plus extraction, solid cover/ray occlusion, flying drones/ground crawlers, rechargeable24-shot magazine, sprint, Explorer mode, mouse and independent touch controls. New/restarted mission awaits existing NanoArcade round gate; pause/resume free. Original procedural visuals/synth audio; no Saltline game source/assets copied. Vendored Three.js MIT license retained. Public rules `/signal-breaker.html`. Source mirrors list their original game license as unverified.
