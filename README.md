@@ -58,3 +58,7 @@ Original 3D arcade racing is the fourth cabinet. Runtime at `docs/games/drift-co
 ## Signal Breaker
 
 Original first-person robot-combat fifth cabinet, runtime `docs/games/signal-breaker/`, private source in nanofun-games. Three relays plus extraction, solid cover/ray occlusion, flying drones/ground crawlers, rechargeable24-shot magazine, sprint, Explorer mode, mouse and independent touch controls. New/restarted mission awaits existing NanoArcade round gate; pause/resume free. Original procedural visuals/synth audio; no Saltline game source/assets copied. Vendored Three.js MIT license retained. Public rules `/signal-breaker.html`. Source mirrors list their original game license as unverified.
+
+## Shadow Grove upgrade
+
+The fifth cabinet retains signal-breaker game ID / public URL and now runs an original rainy bamboo village/shrine variant with spinning swept-collision shuriken, finite12+48pouch/supply caches, timed facing seal interactions, capped reinforcement waves, jump, crouch and focused aim. New cache revision shadow2 invalidates the previous carbine runtime. Public controls/guide and cover reflect the new gameplay. Original independently implemented code/assets; no claim of complete Saltline equivalence. Wallet/payments/ads backend unchanged.

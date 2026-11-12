@@ -2,13 +2,13 @@
   "repository": "prompkami-hub/nanofun-games-site",
   "migration": "nanofun-2026-11-05",
   "content_base_commit": "efef3799445e743068f54cc75b3ae47e72e7b4df",
-  "release": "signal-breaker-original-fps",
-  "released_at": "2026-11-12T01:21:45.293560+00:00",
+  "release": "shadow-grove-shuriken-variant",
+  "released_at": "2026-11-12T01:37:18.792066+00:00",
   "wallet_api_version": "ee-mail-relay-7",
   "game_pack": "wallet-v1.pck",
   "mail_sender_status": "actual_from_and_reply_to_verified",
   "paid_enabled": true,
   "ads_enabled": false,
-  "game_source_commit": "ec5bb92",
+  "game_source_commit": "4328cc62556140e2892816e907f9d1a7ac0ecde7",
   "games_available": 5
 }
