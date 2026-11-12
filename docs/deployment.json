@@ -2,13 +2,13 @@
   "repository": "prompkami-hub/nanofun-games-site",
   "migration": "nanofun-2026-11-05",
   "content_base_commit": "efef3799445e743068f54cc75b3ae47e72e7b4df",
-  "release": "shadow-grove-detailed-environment",
-  "released_at": "2026-11-12T02:25:05.887033+00:00",
+  "release": "saltline-original-source-shuriken",
+  "released_at": "2026-11-12T02:38:24.741227+00:00",
   "wallet_api_version": "ee-mail-relay-7",
   "game_pack": "wallet-v1.pck",
   "mail_sender_status": "actual_from_and_reply_to_verified",
   "paid_enabled": true,
   "ads_enabled": false,
-  "game_source_commit": "bc86ccefeb49cbb29087f901ab3e543ebe212809",
+  "game_source_commit": "4e5efced098b06e166c710e6a6c89def70adf038",
   "games_available": 5
 }

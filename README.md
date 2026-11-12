@@ -67,3 +67,8 @@ The fifth cabinet retains signal-breaker game ID / public URL and now runs an or
 ## Shadow Grove environment revision grove3
 
 Original instanced modular village: individual roof tiles, timber/stone foundations, lattice windows, rain chains, silk banners, gate rope/paper wards, bamboo and leaf dressing. Canvas-authored material relief, directional shadows, local reflection probe, GPU rain streaks, wet courtyards and detailed sentinel/hand models. Desktop/mobile geometry budgets differ; actual gameplay image replaces schematic cover. Existing mission, wallet, touch and billing interfaces preserved. No Saltline source/assets copied.
+
+
+## Saltline original-source adaptation saltline1
+
+User explicitly requested adapting the supplied realcodebear/saltline-fable-5.2 single HTML itself. Original port, containers/cranes, procedural geometry/materials, renderer/post effects, rain, AI, physics, input, audio and complete game flow retained. Only weapon changed to swept-collision spinning shuriken with12+48pouch, original glove reused; new/retry starts gated, free resumes unchanged. Fixed original hidden location card intercepting phone taps. Upstream source/attribution retained privately in nanofun-games/saltline-shuriken; no authorship or new upstream license assertion. Public credit links original/community sources. Prior independent Shadow Grove retained in Git history.
